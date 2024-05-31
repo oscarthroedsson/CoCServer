@@ -10,3 +10,8 @@ export interface addNewMemberProps {
   gameName: string;
   email: string;
 }
+export interface addNewClanProps {
+  tag: string;
+  name: string;
+  warWinLoseRatio: number;
+}
