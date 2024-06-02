@@ -1,6 +1,6 @@
 import prisma from "../../prisma";
 
-export async function doesPlayerExist(clanTag: string): Promise<boolean> {
+export async function doesPlayerExist_clashyStats(clanTag: string): Promise<boolean> {
   try {
     const clan = await prisma.user.findUnique({
       where: {

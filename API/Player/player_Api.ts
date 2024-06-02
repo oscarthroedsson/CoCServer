@@ -3,9 +3,7 @@ import { Response } from "express";
 import { changeToURLencoding } from "../../utils/helpers/urlEncoding";
 
 export async function getPlayer_superCell(gameTag: string): Promise<PlayerObjectResponse> {
-  console.info("Fetching player");
   const convertedGameTag = changeToURLencoding(gameTag); //change # to %23
-  console.log(" convertedGameTag: ", convertedGameTag);
   const response = await fetch(`https://cocproxy.royaleapi.dev/v1/players/${convertedGameTag}`, {
     headers: {
       Authorization: `Bearer ${process.env.BEARER_TOKEN}`,
@@ -19,6 +17,7 @@ export async function getPlayer_superCell(gameTag: string): Promise<PlayerObject
 export async function validateClashAccount_superCell(gameTag: string, token: string, res: Response) {
   const convertedGameTag = changeToURLencoding(gameTag); //change # to %23
   console.log("validateClashAccount_superCell | convertedGameTag: ", convertedGameTag);
+  //todo handle if we get error,  error = code that is made up and not "wrong"
   const response = await fetch(`https://cocproxy.royaleapi.dev/v1/players/${convertedGameTag}/verifytoken`, {
     method: "POST",
     headers: {

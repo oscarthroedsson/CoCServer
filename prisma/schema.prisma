@@ -14,17 +14,19 @@ datasource db {
 }
 
 model User {
-  id                     Int      @id @default(autoincrement()) @db.UnsignedInt
-  gameTag                String   @unique
-  gameName               String   @unique
+  id                     Int               @id @default(autoincrement()) @db.UnsignedInt
+  gameTag                String            @unique
+  gameName               String            @unique
   clanTag                String? // clanTag can be either a String or null
-  totalDonations         Int?     @default(0) // totalDonations can be either an Int or null
-  totalDonationsReceived Int?     @default(0) // totalDonationsReceived can be either an Int or null
-  donationRatio          Int?     @default(0) // donationRatio can be either an Int or null
-  email                  String   @unique
-  createdAt              DateTime @default(now())
-  updatedAt              DateTime @updatedAt
-  acceptTerms            Boolean  @default(false)
+  totalDonations         Int?              @default(0) // totalDonations can be either an Int or null
+  totalDonationsReceived Int?              @default(0) // totalDonationsReceived can be either an Int or null
+  donationRatio          Int?              @default(0) // donationRatio can be either an Int or null
+  email                  String?           @unique
+  createdAt              DateTime          @default(now())
+  updatedAt              DateTime          @updatedAt
+  acceptTerms            Boolean           @default(false)
+  TrophyHistory          TrophyHistory[]
+  DonationHistory        DonationHistory[]
 }
 
 model Clan {
@@ -34,4 +36,24 @@ model Clan {
   warWinLoseRatio Float?   @default(0) // warWinLoseRatio can be either an Int or null
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
+}
+
+model TrophyHistory {
+  id        Int      @id @default(autoincrement()) @db.UnsignedInt
+  user      User     @relation(fields: [gameTag], references: [gameTag])
+  gameTag   String
+  trophies  Int
+  createdAt DateTime @default(now())
+}
+
+model DonationHistory {
+  id                Int      @id @default(autoincrement()) @db.UnsignedInt
+  user              User     @relation(fields: [gameTag], references: [gameTag])
+  gameTag           String
+  gameName          String
+  donations         Int
+  donationsReceived Int
+  donationRatio     Float
+  donerType         String
+  createdAt         DateTime @default(now())
 }

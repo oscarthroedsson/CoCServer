@@ -1,3 +1,17 @@
+export interface PlayerProfilClashyStats {
+  id: number;
+  gameTag: string;
+  gameName: string;
+  clanTag: string | null;
+  totalDonations: number | null;
+  totalDonationsReceived: number | null;
+  donationRatio: number | null;
+  email: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+  acceptTerms: boolean;
+}
+
 export interface PlayerObjectResponse {
   tag: string;
   name: string;

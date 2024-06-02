@@ -1,5 +1,4 @@
 import prisma from "../../prisma";
-import { changeToURLencoding } from "../../utils/helpers/urlEncoding";
 
 export async function doesClanExist_clashyStats(clanTag: string): Promise<boolean> {
   try {
