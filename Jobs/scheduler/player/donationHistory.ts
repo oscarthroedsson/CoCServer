@@ -19,15 +19,6 @@ export async function job_CollectDonationHistory(): Promise<void> {
       const latestDonationHistory = await getLatestDonationHistory_clashyStats(player.gameTag);
 
       if (notTheSameMonth(latestDonationHistory?.createdAt)) {
-        console.log({
-          tag: player.gameTag,
-          name: playerObject.name,
-          donations: playerObject.donations,
-          donationsReceived: playerObject.donationsReceived,
-          donationRatio: playerObject.donations / playerObject.donationsReceived,
-          donerType: donationPerson(playerObject.donations / playerObject.donationsReceived),
-        });
-
         addDonationHistory_clashyStats({
           tag: player.gameTag,
           name: playerObject.name,

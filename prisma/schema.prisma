@@ -14,19 +14,20 @@ datasource db {
 }
 
 model User {
-  id                     Int               @id @default(autoincrement()) @db.UnsignedInt
-  gameTag                String            @unique
-  gameName               String            @unique
-  clanTag                String? // clanTag can be either a String or null
-  totalDonations         Int?              @default(0) // totalDonations can be either an Int or null
-  totalDonationsReceived Int?              @default(0) // totalDonationsReceived can be either an Int or null
-  donationRatio          Int?              @default(0) // donationRatio can be either an Int or null
-  email                  String?           @unique
-  createdAt              DateTime          @default(now())
-  updatedAt              DateTime          @updatedAt
-  acceptTerms            Boolean           @default(false)
-  TrophyHistory          TrophyHistory[]
-  DonationHistory        DonationHistory[]
+  id                       Int                               @id @default(autoincrement()) @db.UnsignedInt
+  gameTag                  String                            @unique
+  gameName                 String                            @unique
+  clanTag                  String? // clanTag can be either a String or null
+  totalDonations           Int?                              @default(0) // totalDonations can be either an Int or null
+  totalDonationsReceived   Int?                              @default(0) // totalDonationsReceived can be either an Int or null
+  donationRatio            Int?                              @default(0) // donationRatio can be either an Int or null
+  email                    String?                           @unique
+  createdAt                DateTime                          @default(now())
+  updatedAt                DateTime                          @updatedAt
+  acceptTerms              Boolean                           @default(false)
+  TrophyHistory            TrophyHistory[]
+  DonationHistory          DonationHistory[]
+  ClanCapitalContributions ClanCapitalContributionsHistory[]
 }
 
 model Clan {
@@ -56,4 +57,14 @@ model DonationHistory {
   donationRatio     Float
   donerType         String
   createdAt         DateTime @default(now())
+}
+
+model ClanCapitalContributionsHistory {
+  id                   Int      @id @default(autoincrement()) @db.UnsignedInt
+  user                 User     @relation(fields: [gameTag], references: [gameTag])
+  gameTag              String
+  clanTag              String
+  capitalContributions Int?
+  totalContributions   Int
+  createdAt            DateTime @default(now())
 }

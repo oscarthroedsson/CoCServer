@@ -8,6 +8,7 @@ import { scheduleJobs } from "./Jobs/scheduler/scheduleJobs";
 
 import { job_CollectDonationHistory } from "./Jobs/scheduler/player/donationHistory";
 import { job_CollectrophyHistory } from "./Jobs/scheduler/player/trophyHistory";
+import { job_clanCapitalContributionsHistory } from "./Jobs/scheduler/player/clanCapitalContributionsHistory";
 
 dotenv.config();
 
@@ -16,7 +17,9 @@ app.use(cors());
 app.use(express.json());
 app.use(morgan("dev"));
 
-scheduleJobs();
+// scheduleJobs();
+// job_CollectDonationHistory();
+job_clanCapitalContributionsHistory();
 
 // Use dem routes
 app.use(routes);
