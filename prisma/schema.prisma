@@ -31,12 +31,30 @@ model User {
 }
 
 model Clan {
-  id              Int      @id @default(autoincrement()) @db.UnsignedInt
-  clanTag         String   @unique
-  clanName        String   @unique
-  warWinLoseRatio Float?   @default(0) // warWinLoseRatio can be either an Int or null
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id                        Int                         @id @default(autoincrement()) @db.UnsignedInt
+  clanTag                   String                      @unique
+  clanName                  String                      @unique
+  warWinLoseRatio           Float?                      @default(0) // warWinLoseRatio can be either an Int or null
+  createdAt                 DateTime                    @default(now())
+  updatedAt                 DateTime                    @updatedAt
+  ClanMembers               LatestClanMembers?
+  JoinedAndLeaveClanHistory JoinedAndLeaveClanHistory[]
+}
+
+model LatestClanMembers {
+  id        Int      @id @default(autoincrement()) @db.UnsignedInt
+  clan      Clan     @relation(fields: [clanTag], references: [clanTag])
+  clanTag   String   @unique
+  members   Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model JoinedAndLeaveClanHistory {
+  id      Int    @id @default(autoincrement()) @db.UnsignedInt
+  clan    Clan   @relation(fields: [clanTag], references: [clanTag])
+  clanTag String @unique
+  data    Json
 }
 
 model TrophyHistory {

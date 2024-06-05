@@ -9,6 +9,7 @@ import { scheduleJobs } from "./Jobs/scheduler/scheduleJobs";
 import { job_CollectDonationHistory } from "./Jobs/scheduler/player/donationHistory";
 import { job_CollectrophyHistory } from "./Jobs/scheduler/player/trophyHistory";
 import { job_clanCapitalContributionsHistory } from "./Jobs/scheduler/player/clanCapitalContributionsHistory";
+import { leavesAndJoinsClan } from "./Jobs/scheduler/clan/leavesAndJoinsClan";
 
 dotenv.config();
 
@@ -18,9 +19,7 @@ app.use(express.json());
 app.use(morgan("dev"));
 
 // scheduleJobs();
-// job_CollectDonationHistory();
-job_clanCapitalContributionsHistory();
-
+leavesAndJoinsClan();
 // Use dem routes
 app.use(routes);
 

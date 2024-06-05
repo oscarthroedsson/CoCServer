@@ -1,0 +1,115 @@
+import { Prisma } from "@prisma/client";
+import prisma from "../../prisma";
+import { ClanMemberRecord } from "../types/clanService.types";
+import { ClanHistoryEntry, leaveAndJoinClanHistoryObject } from "../../Jobs/scheduler/types/clan/jobsClan.types";
+
+export async function getAllClans_clashyStats() {
+  try {
+    const clans = await prisma.clan.findMany({
+      select: {
+        clanTag: true,
+      },
+    });
+
+    return clans;
+  } catch (error) {
+    console.error("Error while updating player:", error);
+    throw error; // Rethrow the error for error handling
+  }
+}
+
+/**
+ * @description This function is responsible for adding a clan member record
+ * @param {string} clanTag - The clan tag
+ */
+export async function addClanMemberRecord(clanMembers: ClanMemberRecord) {
+  try {
+    await prisma.latestClanMembers.create({
+      data: {
+        clanTag: clanMembers.clanTag,
+        members: clanMembers.clanMembers,
+      },
+    });
+  } catch (error) {
+    //todo → Email should be send to oscar.throedsson@gmail.com
+    console.error("Error while updating clan members:", error);
+  }
+}
+
+export async function updateClanMemberRecord(clan: ClanMemberRecord) {
+  try {
+    await prisma.latestClanMembers.update({
+      where: {
+        clanTag: clan.clanTag,
+      },
+      data: {
+        members: clan.clanMembers,
+      },
+    });
+  } catch (error) {
+    //todo → Email should be send to oscar.throedsson@gmail.com
+    console.error("Error while updating clan members:", error);
+  }
+}
+
+export async function getClanMemberRecord(clanTag: string) {
+  try {
+    const clanMembers = await prisma.latestClanMembers.findUnique({
+      where: {
+        clanTag: clanTag,
+      },
+    });
+
+    return clanMembers;
+  } catch (error) {
+    //todo → Email should be send to oscar.throedsson@gmail.com
+    console.error("Error while getting clan members:", error);
+  }
+}
+
+export async function storeJoinedAndLeaveClanHistory(clanTag: string, data: { [key: string]: ClanHistoryEntry }) {
+  try {
+    await prisma.joinedAndLeaveClanHistory.create({
+      data: {
+        clanTag: clanTag,
+        data: data as any,
+      },
+    });
+  } catch (error) {
+    //todo → Email should be send to oscar.throedsson@gmail.com
+    console.error("Error while creating leave and join data:", error);
+  }
+}
+
+export async function getJoinedAndLeaveClanHistory(
+  clanTag: string
+): Promise<leaveAndJoinClanHistoryObject | null | undefined> {
+  try {
+    const record = await prisma.joinedAndLeaveClanHistory.findFirst({
+      where: {
+        clanTag: clanTag,
+      },
+    });
+
+    return record as leaveAndJoinClanHistoryObject | null;
+  } catch (error) {
+    //todo → Email should be send to oscar.throedsson@gmail.com
+    console.error("Error while fetching leave and join data:", error);
+  }
+}
+
+export async function updateJoinedAndLeaveClanHistory(recordObject: leaveAndJoinClanHistoryObject) {
+  try {
+    const record = await prisma.joinedAndLeaveClanHistory.update({
+      where: {
+        clanTag: recordObject.clanTag,
+      },
+      data: {
+        data: recordObject.data as any,
+      }
+    });
+  } catch (error) {
+    //todo → Email should be send to oscar.throedsson@gmail.com
+    console.error("Error while updating leave and join data:", error);
+  }
+}

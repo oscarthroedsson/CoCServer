@@ -1,12 +1,14 @@
 import { getPlayer_superCell } from "../../API/Player/player_Api";
+import { addClanMemberRecord } from "../../service/Clan/clan_service";
+
 import { registerPlayer_clashyStats } from "../../service/Register/registerPlayer_service";
+import { ClanMemberRecordObject } from "../../service/types/clanService.types";
 import { doesPlayerExist_clashyStats } from "../../validation/Player/doesPlayerExist";
 
 export async function onBoardClanMembers(clanTag: string, clanMembers: any[]) {
-  console.log("🏰 Clan Members: ", clanMembers);
-
   for (const member of clanMembers) {
     const memberExist = await doesPlayerExist_clashyStats(member.tag);
+
     if (!memberExist) {
       const playerObject = await getPlayer_superCell(member.tag);
 
@@ -18,11 +20,24 @@ export async function onBoardClanMembers(clanTag: string, clanMembers: any[]) {
           email: null,
           acceptTerms: false,
         });
+
         console.log(`Added: ${playerObject.tag} ${playerObject.name}`);
       }
     }
   }
-  return;
+}
+
+export async function onBoardClanMemberRegister(clanTag: string, clanMembers: any[]) {
+  const members: ClanMemberRecordObject[] = [];
+
+  clanMembers.forEach((member: any) => {
+    members.push({
+      gameTag: member.tag,
+      gameName: member.name,
+    });
+  });
+
+  addClanMemberRecord({ clanTag: clanTag, clanMembers: members });
 }
 
 /*
