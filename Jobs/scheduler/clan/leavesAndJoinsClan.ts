@@ -13,7 +13,7 @@ import { ClanMemberRecordObject } from "../../../service/types/clanService.types
 
 import { MemberShipChangesObject } from "../types/clan/jobsClan.types";
 
-export async function leavesAndJoinsClan() {
+export async function job_leavesAndJoinsClan() {
   const clanTags = await getAllClans_clashyStats();
   const dateToday = new Date();
   const formattedDate = dateToday.toISOString().split("T")[0].toString();

@@ -8,5 +8,4 @@ export interface addNewMemberProps {
 export interface addNewClanProps {
   tag: string;
   name: string;
-  warWinLoseRatio: number;
 }

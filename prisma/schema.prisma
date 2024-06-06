@@ -34,7 +34,6 @@ model Clan {
   id                        Int                         @id @default(autoincrement()) @db.UnsignedInt
   clanTag                   String                      @unique
   clanName                  String                      @unique
-  warWinLoseRatio           Float?                      @default(0) // warWinLoseRatio can be either an Int or null
   createdAt                 DateTime                    @default(now())
   updatedAt                 DateTime                    @updatedAt
   ClanMembers               LatestClanMembers?
@@ -85,4 +84,38 @@ model ClanCapitalContributionsHistory {
   capitalContributions Int?
   totalContributions   Int
   createdAt            DateTime @default(now())
+}
+
+model ClanWarLeagueMatch {
+  id                    Int      @id @default(autoincrement()) @db.UnsignedInt
+  warTag                String
+  clanTag               String
+  season                String
+  seasonYear            Int
+  seasonMonth           Int
+  startTime             DateTime
+  endTime               DateTime
+  round                 Int
+  clanLevel             Int
+  teamSize              Int
+  numOfAttacks          Int
+  attacks               Json
+  stars                 Int
+  destructionPercentage Float
+  winner                String
+  opponent              String
+  opponentsAttacks      Json
+}
+
+model ClanWarLeagueAttack {
+  id                    Int     @id @default(autoincrement()) @db.UnsignedInt
+  warTag                String
+  round                 Int
+  attackerTag           String
+  attackerName          String
+  stars                 Int
+  destructionPercentage Float
+  opponentTag           String
+  opponentDidAttack     Boolean
+  opponentsAttack       Json
 }

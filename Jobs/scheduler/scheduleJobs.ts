@@ -3,13 +3,18 @@ import { cronExecutionTime } from "../../utils/constants/cronSchedules";
 import { job_CollectrophyHistory } from "./player/trophyHistory";
 import { job_CollectDonationHistory } from "./player/donationHistory";
 import { job_clanCapitalContributionsHistory } from "./player/clanCapitalContributionsHistory";
+import { job_leavesAndJoinsClan } from "./clan/leavesAndJoinsClan";
 
 export function scheduleJobs() {
   cron.schedule(
     cronExecutionTime.Every_SixHours,
     () => {
       console.log(`schedule| Running trophyHistory() in 6 hours`);
+      //🃏 Player
       job_CollectrophyHistory();
+
+      //🕵️ clan
+      job_leavesAndJoinsClan();
     },
     {
       timezone: "Europe/Stockholm",
@@ -24,8 +29,11 @@ export function scheduleJobs() {
       tomorrow.setDate(tomorrow.getDate() + 1);
 
       if (tomorrow.getDate() === 1) {
+        // 🃏 Player
         await job_CollectDonationHistory();
         await job_clanCapitalContributionsHistory();
+
+        //🕵️ clan
       }
     },
     {

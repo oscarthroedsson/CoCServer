@@ -76,10 +76,10 @@ export async function registerNewUser(req: Request<addNewMemberProps>, res: Resp
     if (!clanExist) {
       try {
         const clan = await getClan_superCell(playerObject.clan.tag);
+
         await registerClan_clashyStats({
           tag: clan.tag,
           name: clan.name,
-          warWinLoseRatio: parseFloat((clan.warWins / clan.warLosses).toFixed(1)),
         });
 
         onBoardClanMemberRegister(clan.tag, clan.memberList);

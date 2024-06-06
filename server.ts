@@ -9,7 +9,8 @@ import { scheduleJobs } from "./Jobs/scheduler/scheduleJobs";
 import { job_CollectDonationHistory } from "./Jobs/scheduler/player/donationHistory";
 import { job_CollectrophyHistory } from "./Jobs/scheduler/player/trophyHistory";
 import { job_clanCapitalContributionsHistory } from "./Jobs/scheduler/player/clanCapitalContributionsHistory";
-import { leavesAndJoinsClan } from "./Jobs/scheduler/clan/leavesAndJoinsClan";
+import { job_leavesAndJoinsClan } from "./Jobs/scheduler/clan/leavesAndJoinsClan";
+import { collectClanWarLeauge } from "./Jobs/scheduler/war/ClanWarLeague/isClanWarLeagueActive";
 
 dotenv.config();
 
@@ -19,7 +20,7 @@ app.use(express.json());
 app.use(morgan("dev"));
 
 // scheduleJobs();
-leavesAndJoinsClan();
+collectClanWarLeauge();
 // Use dem routes
 app.use(routes);
 

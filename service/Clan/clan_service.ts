@@ -100,13 +100,13 @@ export async function getJoinedAndLeaveClanHistory(
 
 export async function updateJoinedAndLeaveClanHistory(recordObject: leaveAndJoinClanHistoryObject) {
   try {
-    const record = await prisma.joinedAndLeaveClanHistory.update({
+    await prisma.joinedAndLeaveClanHistory.update({
       where: {
         clanTag: recordObject.clanTag,
       },
       data: {
         data: recordObject.data as any,
-      }
+      },
     });
   } catch (error) {
     //todo → Email should be send to oscar.throedsson@gmail.com

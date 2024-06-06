@@ -6,7 +6,6 @@ export function registerClan_clashyStats(newClan: addNewClanProps) {
     data: {
       clanTag: newClan.tag,
       clanName: newClan.name,
-      warWinLoseRatio: newClan.warWinLoseRatio,
     },
   });
 }
