@@ -1,6 +1,6 @@
 import { changeToURLencoding } from "../../utils/helpers/urlEncoding";
 
-export async function isClanWarLeagueActive(clanTag: string) {
+export async function isClanWarLeagueActive_superCell(clanTag: string) {
   const convertedClanTag = changeToURLencoding(clanTag);
   const response = await fetch(`https://cocproxy.royaleapi.dev/v1/clans/${convertedClanTag}/currentwar/leaguegroup`, {
     headers: {

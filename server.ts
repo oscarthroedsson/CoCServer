@@ -10,7 +10,7 @@ import { job_CollectDonationHistory } from "./Jobs/scheduler/player/donationHist
 import { job_CollectrophyHistory } from "./Jobs/scheduler/player/trophyHistory";
 import { job_clanCapitalContributionsHistory } from "./Jobs/scheduler/player/clanCapitalContributionsHistory";
 import { job_leavesAndJoinsClan } from "./Jobs/scheduler/clan/leavesAndJoinsClan";
-import { collectClanWarLeauge } from "./Jobs/scheduler/war/ClanWarLeague/isClanWarLeagueActive";
+import { collectClanWarLeauge } from "./Jobs/scheduler/war/ClanWarLeague/collectClanWarLeauge";
 
 dotenv.config();
 

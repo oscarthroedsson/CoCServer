@@ -28,6 +28,8 @@ model User {
   TrophyHistory            TrophyHistory[]
   DonationHistory          DonationHistory[]
   ClanCapitalContributions ClanCapitalContributionsHistory[]
+  ClanWarLeagueAttacks     ClanWarLeagueAttack[]             @relation("attacker")
+  ClanWarLeagueDefenses    ClanWarLeagueAttack[]             @relation("defender")
 }
 
 model Clan {
@@ -38,6 +40,9 @@ model Clan {
   updatedAt                 DateTime                    @updatedAt
   ClanMembers               LatestClanMembers?
   JoinedAndLeaveClanHistory JoinedAndLeaveClanHistory[]
+  ClanWarLeagueGroupClan    ClanWarLeagueGroupClan[]
+  matchesAsClanOne          ClanWarLeagueMatch[]        @relation("clanOne")
+  matchesAsClanTwo          ClanWarLeagueMatch[]        @relation("clanTwo")
 }
 
 model LatestClanMembers {
@@ -86,36 +91,50 @@ model ClanCapitalContributionsHistory {
   createdAt            DateTime @default(now())
 }
 
+// borde heta season
+model ClanWarLeagueGroup {
+  id          Int                      @id @default(autoincrement())
+  seasonYear  Int
+  seasonMonth Int
+  groupClans  ClanWarLeagueGroupClan[]
+  matches     ClanWarLeagueMatch[]
+}
+
+model ClanWarLeagueGroupClan {
+  id      Int                @id @default(autoincrement())
+  clanTag String
+  group   ClanWarLeagueGroup @relation(fields: [groupId], references: [id])
+  groupId Int
+  clan    Clan               @relation(fields: [clanTag], references: [clanTag])
+
+  @@unique([clanTag, groupId])
+}
+
 model ClanWarLeagueMatch {
-  id                    Int      @id @default(autoincrement()) @db.UnsignedInt
-  warTag                String
-  clanTag               String
-  season                String
-  seasonYear            Int
-  seasonMonth           Int
-  startTime             DateTime
-  endTime               DateTime
-  round                 Int
-  clanLevel             Int
-  teamSize              Int
-  numOfAttacks          Int
-  attacks               Json
-  stars                 Int
-  destructionPercentage Float
-  winner                String
-  opponent              String
-  opponentsAttacks      Json
+  id           Int                   @id @default(autoincrement())
+  round        Int
+  clanOneTag   String
+  clanTwoTag   String
+  clanOneStats Json
+  clanTwoStats Json
+  groupId      Int
+  winner       String
+  clanOne      Clan                  @relation("clanOne", fields: [clanOneTag], references: [clanTag])
+  clanTwo      Clan                  @relation("clanTwo", fields: [clanTwoTag], references: [clanTag])
+  group        ClanWarLeagueGroup    @relation(fields: [groupId], references: [id])
+  attacks      ClanWarLeagueAttack[]
 }
 
 model ClanWarLeagueAttack {
-  id                    Int     @id @default(autoincrement()) @db.UnsignedInt
-  warTag                String
-  round                 Int
-  attackerTag           String
-  attackerName          String
+  id                    Int                @id @default(autoincrement())
+  attackerPlayerTag     String
+  defenderPlayerTag     String
   stars                 Int
   destructionPercentage Float
-  opponentTag           String
-  opponentDidAttack     Boolean
-  opponentsAttack       Json
+  duration              Int
+  matchId               Int
+  gotAttacked           Boolean
+  attacker              User               @relation("attacker", fields: [attackerPlayerTag], references: [gameTag])
+  defender              User               @relation("defender", fields: [defenderPlayerTag], references: [gameTag])
+  match                 ClanWarLeagueMatch @relation(fields: [matchId], references: [id])
 }
