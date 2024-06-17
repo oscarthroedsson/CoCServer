@@ -1,7 +1,7 @@
 import { Prisma } from "@prisma/client";
 import prisma from "../../prisma";
 import { ClanMemberRecord } from "../types/clanService.types";
-import { ClanHistoryEntry, leaveAndJoinClanHistoryObject } from "../../Jobs/scheduler/types/clan/jobsClan.types";
+import { ClanHistoryEntry, leaveAndJoinClanHistoryObject } from "../../Jobs/types/clan/jobsClan.types";
 
 export async function getAllClans_clashyStats() {
   try {

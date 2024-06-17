@@ -1,9 +1,10 @@
 import cron from "node-cron";
-import { cronExecutionTime } from "../../utils/constants/cronSchedules";
+import { cronExecutionTime } from "../utils/constants/cronSchedules";
 import { job_CollectrophyHistory } from "./player/trophyHistory";
 import { job_CollectDonationHistory } from "./player/donationHistory";
 import { job_clanCapitalContributionsHistory } from "./player/clanCapitalContributionsHistory";
 import { job_leavesAndJoinsClan } from "./clan/leavesAndJoinsClan";
+import { checkIfClanIsAtWar } from "./war/ClanWar/checkIfClanIsAtWar";
 
 export function scheduleJobs() {
   cron.schedule(
@@ -35,6 +36,19 @@ export function scheduleJobs() {
 
         //🕵️ clan
       }
+    },
+    {
+      timezone: "Europe/Stockholm",
+    }
+  );
+
+  /**
+   * @description Check if clan is at war
+   */
+  cron.schedule(
+    cronExecutionTime.Every_TwelveHours,
+    async () => {
+      const data = await checkIfClanIsAtWar();
     },
     {
       timezone: "Europe/Stockholm",

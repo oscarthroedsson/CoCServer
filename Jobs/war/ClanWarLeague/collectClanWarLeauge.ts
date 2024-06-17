@@ -2,21 +2,21 @@ import { match } from "assert";
 import {
   getClanWarLeagueGroup_superCell,
   getClanWarLeagueRoundMatch_superCell,
-} from "../../../../API/ClanWarLeague/clanWarLeague_Api";
-import { onBoardClanAndMembers } from "../../../../middlewares/Onboarding/clan_Onboarding";
-import { getAllClans_clashyStats } from "../../../../service/Clan/clan_service";
+} from "../../../API/ClanWarLeague/clanWarLeague_Api";
+import { onBoardClanAndMembers } from "../../../middlewares/Onboarding/clan_Onboarding";
+import { getAllClans_clashyStats } from "../../../service/Clan/clan_service";
 import {
   storeClanWarLeagueAttacks_clashyStats,
   storeClanWarLeagueGroup_clashyStats,
   storeClanWarLeagueMatch_clashyStats,
-} from "../../../../service/ClanWarLeague/clanWarLeague_service";
-import { doesCWLMatchExist_clashyStats } from "../../../../validation/war/doesCWLMatchExist";
-import { isClanWarLeagueActive_superCell } from "../../../../validation/war/isClanWarLeagueActive";
-import { findMatchWinner } from "../../../../utils/helpers/foundMatchWinner";
-import { createCLWMatchObject_model } from "../../../../models/createCLWMatchObject_model";
-import { CwlMatchObject } from "../../../../models/types/cwlMatchObject.types";
-import { convertToMatchObject } from "../../../../models/convertToMatchObjects";
-import { convertToAttackObject } from "../../../../models/convertToAttackObject";
+} from "../../../service/ClanWarLeague/clanWarLeague_service";
+import { doesCWLMatchExist_clashyStats } from "../../../validation/war/doesCWLMatchExist";
+import { isClanWarLeagueActive_superCell } from "../../../validation/war/isClanWarLeagueActive";
+import { findMatchWinner } from "../../../utils/helpers/foundMatchWinner";
+import { createCLWMatchObject_model } from "../../../models/createCLWMatchObject_model";
+import { CwlMatchObject } from "../../../models/types/cwlMatchObject.types";
+import { convertToMatchObject } from "../../../models/convertToMatchObjects";
+import { convertToAttackObject } from "../../../models/convertToAttackObject";
 
 export async function collectClanWarLeauge() {
   const allClans = await getAllClans_clashyStats();
