@@ -13,11 +13,16 @@ export async function checkIfClanIsAtWar() {
 
     const data = await isClanAtWar_superCell(tag.clanTag);
 
-    if (data.state !== "inWar") continue;
+    if (data.state !== "inWar" || data.state !== "preparation") continue;
 
-    const convertedTime = convertToCorrectDateObject(data.endTime);
-    const timeToScheduleJob = new Date(convertedTime.getTime() - 5 * 60 * 1000); // 5min before war ends
+    // check if opponent is in our DB B
+    // → if not, add them to our DB and add a job on the clan manually so we also collect war info on them.
 
-    // ställ i kö
+    // check if the job should be scheduled or we should collect data directly
+    // → if the war ends in less than 5min, we should collect data directly
+    // → if the war ends in more than 5min, we should schedule a job to collect data
+
+    // const convertedTime = convertToCorrectDateObject(data.endTime);
+    // const timeToScheduleJob = new Date(convertedTime.getTime() - 5 * 60 * 1000); // 5min before war ends
   }
 }

@@ -19,8 +19,9 @@ export async function getAllClans_clashyStats() {
 }
 
 /**
- * @description This function is responsible for adding a clan member record
- * @param {string} clanTag - The clan tag
+ * @description Add a record of the present clan members so we can use this for JoinedAndLeaceClanHistory table
+ * @param {clanTag:string, clanMembers:{gameTag:string, gameName:string}} clanMembers - The clan tag
+ * @returns {Promise<void>}
  */
 export async function addClanMemberRecord(clanMembers: ClanMemberRecord) {
   try {
@@ -36,6 +37,11 @@ export async function addClanMemberRecord(clanMembers: ClanMemberRecord) {
   }
 }
 
+/**
+ * @description Update the record of the present clan members so we can use this for JoinedAndLeaceClanHistory table
+ * @param clan
+ * @returns {Promise<{id:number, clanTag:String, members:{gameTag:string, gameName:string}[] }>}
+ */
 export async function updateClanMemberRecord(clan: ClanMemberRecord) {
   try {
     await prisma.latestClanMembers.update({

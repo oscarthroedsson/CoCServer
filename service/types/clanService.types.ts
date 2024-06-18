@@ -1,4 +1,5 @@
 export interface ClanMemberRecord {
+  id?: number;
   clanTag: string;
   clanMembers: ClanMemberRecordObject[];
 }

@@ -1,6 +1,7 @@
+import { ClanObject } from "../../types/Clan/clanObject_Supercell.types";
 import { changeToURLencoding } from "../../utils/helpers/urlEncoding";
 
-export async function getClan_superCell(clanTag: string): Promise<any> {
+export async function getClan_superCell(clanTag: string): Promise<ClanObject> {
   const convertedClanTag = changeToURLencoding(clanTag);
   console.log("getClan_superCell |  convertedClanTag: ", convertedClanTag);
 

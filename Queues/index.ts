@@ -11,10 +11,10 @@ Queue, worker and job, all needs the same name names to work together.
 */
 
 const client = createClient({
-  password: "MBvK0hGBtH3OEebTlnzjnXL83LTi4nWd",
+  password: process.env.REDIS_PASWORD,
   socket: {
-    host: "redis-18505.c328.europe-west3-1.gce.redns.redis-cloud.com",
-    port: 18505,
+    host: process.env.REDIS_HOST,
+    port: Number(process.env.REDIS_PORT),
   },
 });
 

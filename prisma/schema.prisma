@@ -13,6 +13,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// ---------------------------------------- 👥 PROFILE TABLES --------------------------------------------------
 model User {
   id                       Int                               @id @default(autoincrement()) @db.UnsignedInt
   gameTag                  String                            @unique
@@ -30,6 +31,8 @@ model User {
   ClanCapitalContributions ClanCapitalContributionsHistory[]
   ClanWarLeagueAttacks     ClanWarLeagueAttack[]             @relation("attacker")
   ClanWarLeagueDefenses    ClanWarLeagueAttack[]             @relation("defender")
+  ClanWarAttack            ClanWarAttack[]                   @relation("attacker")
+  ClanWarDefenses          ClanWarAttack[]                   @relation("defender")
 }
 
 model Clan {
@@ -43,8 +46,11 @@ model Clan {
   ClanWarLeagueGroupClan    ClanWarLeagueGroupClan[]
   matchesAsClanOne          ClanWarLeagueMatch[]        @relation("clanOne")
   matchesAsClanTwo          ClanWarLeagueMatch[]        @relation("clanTwo")
+  clanWarAsClanOne          ClanWarMatch[]              @relation("clanOne")
+  clanWarAsClanTwo          ClanWarMatch[]              @relation("clanTwo")
 }
 
+// ---------------------------------------- 📜 COLLECT HISTORY TABLES --------------------------------------------------
 model LatestClanMembers {
   id        Int      @id @default(autoincrement()) @db.UnsignedInt
   clan      Clan     @relation(fields: [clanTag], references: [clanTag])
@@ -91,7 +97,7 @@ model ClanCapitalContributionsHistory {
   createdAt            DateTime @default(now())
 }
 
-// borde heta season
+// ---------------------------------------- 🪖⚔️ CLAN WAR LEAGUE TABLES --------------------------------------------------
 model ClanWarLeagueGroup {
   id          Int                      @id @default(autoincrement())
   seasonYear  Int
@@ -137,4 +143,42 @@ model ClanWarLeagueAttack {
   attacker              User               @relation("attacker", fields: [attackerPlayerTag], references: [gameTag])
   defender              User               @relation("defender", fields: [defenderPlayerTag], references: [gameTag])
   match                 ClanWarLeagueMatch @relation(fields: [matchId], references: [id])
+}
+
+// ---------------------------------------- 🪖 CLAN WAR TABLES --------------------------------------------------
+
+model ClanWarMatch {
+  id            Int             @id @default(autoincrement())
+  seasonYear    Int
+  seasonMonth   Int
+  clanOneTag    String
+  clanTwoTag    String
+  clanOneStats  Json
+  clanTwoStats  Json
+  teamSize      Int
+  winner        String
+  clanOne       Clan            @relation("clanOne", fields: [clanOneTag], references: [clanTag])
+  clanTwo       Clan            @relation("clanTwo", fields: [clanTwoTag], references: [clanTag])
+  ClanWarAttack ClanWarAttack[]
+}
+
+//match stats/json {
+// "stars": 43,
+// "attacks": 15,
+// "destructionPercentage": 98.53333333333332
+
+model ClanWarAttack {
+  id                    Int     @id @default(autoincrement())
+  matchId               Int
+  attackerPlayerTag     String
+  defenderPlayerTag     String
+  stars                 Int
+  destructionPercentage Float
+  duration              Int
+  attacks               Int // 0 - 1 - 2 
+  gotAttacked           Boolean
+
+  attacker User         @relation("attacker", fields: [attackerPlayerTag], references: [gameTag])
+  defender User         @relation("defender", fields: [defenderPlayerTag], references: [gameTag])
+  match    ClanWarMatch @relation(fields: [matchId], references: [id])
 }

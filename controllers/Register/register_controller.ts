@@ -68,7 +68,7 @@ export async function registerNewUser(req: Request<addNewMemberProps>, res: Resp
 
     if (clan.memberList.length > 0) {
       console.log("ON BOARDING CLAN");
-      onBoardClanMembers(clan.tag, clan.memberList);
+      onBoardClanMembers(clan.tag);
     }
 
     const clanExist = await doesClanExist_clashyStats(playerObject.clan.tag);
@@ -82,7 +82,7 @@ export async function registerNewUser(req: Request<addNewMemberProps>, res: Resp
           name: clan.name,
         });
 
-        onBoardClanMemberRegister(clan.tag, clan.memberList);
+        onBoardClanMemberRegister(clan.tag);
       } catch (err) {
         res.status(200).send({
           status: "error",

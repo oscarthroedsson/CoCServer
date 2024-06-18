@@ -4,9 +4,8 @@ import morgan from "morgan";
 import routes from "./routes";
 import dotenv from "dotenv";
 import { scheduleJobs } from "./Jobs/scheduleJobs";
-import { checkIfClanIsAtWar } from "./Jobs/war/ClanWar/checkIfClanIsAtWar";
-import { createClient } from "redis";
-import "./Queues/index";
+import { collectClanWar } from "./Jobs/war/ClanWar/collectClanWar";
+// import "./Queues/index";
 
 dotenv.config();
 
@@ -18,7 +17,7 @@ app.use(morgan("dev"));
 app.use(routes);
 
 // scheduleJobs();
-// checkIfClanIsAtWar();
+collectClanWar();
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
