@@ -1,12 +1,13 @@
 import { Queue, Worker, Job } from "bullmq";
-import IORedis from "ioredis";
 import { collectClanWar } from "../Jobs/war/ClanWar/collectClanWar";
 import { createClient } from "redis";
 import { redisConnection } from "../config/redis";
 
 /*
-
-
+Queue, worker and job, all needs the same name names to work together.
+⇛ new Queue("→ collectClanWarInfo ←", {connection: redisConnection});
+⇛ new Worker("→ collectClanWarInfo ←",()=>{});
+⇛ await testQueue.add("→ collectClanWarInfo ←", ()=>{});
 */
 
 const client = createClient({
@@ -29,26 +30,17 @@ const testQueue = new Queue("collectClanWarInfo", {
 });
 
 /**
- * Represents a test worker.
+ Creates a new worker instance. The name of the worker and the logic is the most important. Create it, write the logic then leave it alone. 
  */
-
-const testWorker = new Worker(
+new Worker(
   "collectClanWarInfo",
   async (job) => {
-    console.log("🏓 Inside: testWorker = new Worker");
+    // The worker should contain the logic that needs to be executed for each job
+    console.log("🥈 Inside worker");
     collectClanWar();
-    console.log("initiated collectClanWar");
   },
   { connection: redisConnection, concurrency: 50 }
 );
-
-testWorker.on("error", (err) => {
-  console.error("🚨 Error:", err);
-});
-
-testWorker.on("completed", (job: Job) => {
-  console.log("🏓 Completed", job.id, job.name, job.data);
-});
 
 /**
  * Adds a job to the test queue.
@@ -60,18 +52,20 @@ async function addJobb() {
   await testQueue.add(
     "collectClanWarInfo",
     async (job: { id: any }) => {
-      console.log("🏓 Inside: testWorker = new Worker");
+      console.log("🥇 Adding my Job");
       // Simulate work
       await new Promise((resolve) => setTimeout(resolve, 2000)); // Simulate 2 seconds of work
-      console.log("Work completed for job:", job.id);
       return { result: "Job completed successfully" };
-    }
-    // { removeOnComplete: true, removeOnFail: true }
+    },
+    { removeOnComplete: true, removeOnFail: true, delay: 1000 }
   );
   getQueueJobs();
 }
 addJobb();
 
+/*
+This function only console.log jobs in the queue for me o see. It has nothing to do wih my main goal 🥅
+*/
 async function getQueueJobs() {
   try {
     const waitingJobs = await testQueue.getJobs("waiting");
@@ -81,10 +75,7 @@ async function getQueueJobs() {
     const delayedJobs = await testQueue.getJobs("delayed");
     const allJobs = await testQueue.getJobs(["waiting", "active", "completed", "failed", "delayed"]);
 
-    testWorker.on("completed", (job: Job) => {
-      console.log("🏓 Completed", job.id, job.name, job.data);
-    });
-
+    console.log("🥉 Looking at the state of the job");
     waitingJobs.forEach((job) => {
       console.log("💤 Waiting", job.id, job.name, job.data);
     });

@@ -1,3 +1,3 @@
 export function collectClanWar() {
-  console.log("🚗 collectClanWar körs");
+  console.log("🏰 collectClanWar körs");
 }
