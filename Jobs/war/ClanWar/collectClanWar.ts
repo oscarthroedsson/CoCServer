@@ -27,11 +27,9 @@ export async function collectClanWar(clanTag: string) {
   const seasonMonth: number = convertToCorrectDateObject(clanWarData.endTime).getMonth();
 
   const clans = [clanWarData.clan, clanWarData.opponent];
-
   // validate if clan exist in our DB, if not → add them and their members to our DB
   for (const clan of clans) {
     const clanExist = await doesClanExist_clashyStats(clan.tag);
-    console.log("🕵🏼‍♂️🔍 Clan exist?:", clanExist);
     if (!clanExist) {
       console.log("🚢 Onboarding Clan And Members");
       await onBoardClanAndMembers({ tag: clan.tag, name: clan.name, members: clan.members });
@@ -48,7 +46,6 @@ export async function collectClanWar(clanTag: string) {
       seasonYear,
       seasonMonth
     );
-    console.log("🏰 Match objet exist?:", matchObjectOfOpponentExist);
     if (matchObjectOfOpponentExist) return;
   }
 
@@ -57,7 +54,6 @@ export async function collectClanWar(clanTag: string) {
 
   if (!clanWarMatchObject) return; // todo Skicka mail till mig själv att det inte gick att göra om objektet
   const { id } = await createClanWarMatch_clashyStats(clanWarMatchObject);
-  console.log("🏰 id", id);
 
   // 🍭 Loop over clan and opponents member and collect attackobjects
   const clanMembersAttacks = clanWarData.clan.members.flatMap((player: ClanWarMemberObject_Supercell) => {
@@ -67,6 +63,7 @@ export async function collectClanWar(clanTag: string) {
   const opponentMembersAttacks = clanWarData.clan.members.flatMap((player: ClanWarMemberObject_Supercell) => {
     return convertToClanWarAttackObject(id, player);
   });
+
   const allAttacks = [...clanMembersAttacks, ...opponentMembersAttacks];
   await storeClanWarAttack_clashyStats(allAttacks);
 }

@@ -1,7 +1,9 @@
 import { isClanAtWar_superCell } from "../../../API/War/war_Api";
 import { addJobb_collectClanWarData } from "../../../Queues";
+import { onBoardClanAndMembers } from "../../../middlewares/Onboarding/clan_Onboarding";
 import { getAllClans_clashyStats } from "../../../service/Clan/clan_service";
 import { convertToCorrectDateObject } from "../../../utils/helpers/converToCorrectDateObj";
+import { doesClanExist_clashyStats } from "../../../validation/Clan/doesClanExist";
 
 export async function checkIfClanIsAtWar() {
   let count = 0;
@@ -17,21 +19,18 @@ export async function checkIfClanIsAtWar() {
 
     const endTime = convertToCorrectDateObject(clanWarData.endTime).fulldate;
 
-    // scheduale job for both the clan and the opponent
-    [clanWarData.clan, clanWarData.opponent].forEach(async (clan) => {
-      // todo | Validate if the clans exits and if not, collect save clan and their members to our DB
+    const clans = [clanWarData.clan, clanWarData.opponent];
 
+    for (const clan of clans) {
+      // check if we have both clans in DB, if not, add them and onboard members
+      const clanExist = await doesClanExist_clashyStats(clan.tag);
+      if (!clanExist) {
+        console.log("🚢 Onboarding Clan And Members");
+        onBoardClanAndMembers({ tag: clan.tag, name: clan.name, members: clan.members });
+      }
+
+      // add job to queue
       await addJobb_collectClanWarData(endTime, clan.tag);
-    });
-
-    // check if opponent is in our DB B
-    // → if not, add them to our DB and add a job on the clan manually so we also collect war info on them.
-
-    // check if the job should be scheduled or we should collect data directly
-    // → if the war ends in less than 5min, we should collect data directly
-    // → if the war ends in more than 5min, we should schedule a job to collect data
-
-    // const convertedTime = convertToCorrectDateObject(data.endTime);
-    // const timeToScheduleJob = new Date(convertedTime.getTime() - 5 * 60 * 1000); // 5min before war ends
+    }
   }
 }
