@@ -4,6 +4,7 @@ export function getAttackPercentage(attacksPerPlayer: number, teamSize: number, 
     const attacksCount = player.attacks ? player.attacks.length : 0;
     return acc + attacksCount;
   }, 0);
+  const attackPercentage = (attacksMade / possibleAttacks) * 100;
 
-  return possibleAttacks / attacksMade;
+  return attackPercentage;
 }

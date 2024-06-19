@@ -25,7 +25,7 @@ client.on("connect", () => {
 /**
  * Represents a queue for tester.
  */
-const testQueue = new Queue("collectClanWarInfo", {
+const collectClanWarData = new Queue("collectClanWarInfo", {
   connection: redisConnection,
 });
 
@@ -36,44 +36,54 @@ new Worker(
   "collectClanWarInfo",
   async (job) => {
     // The worker should contain the logic that needs to be executed for each job
-    console.log("🥈 Inside worker");
-    collectClanWar();
+    console.log("🏁 Worker was run", job.data.clanTag);
+    // collectClanWar(job.data.clanTag);
   },
   { connection: redisConnection, concurrency: 50 }
 );
 
 /**
- * Adds a job to the test queue.
- * If the redisConnection is not available, it logs an error message.
+ * @description This function adds a job to the queue to collect clan war data.
+ * @param delay number, clanTag string
+ * @returns void
  */
-async function addJobb() {
-  if (!redisConnection) console.log("something wrong with redisConnection");
 
-  await testQueue.add(
+export async function addJobb_collectClanWarData(endTime: Date, clanTag: string) {
+  if (!redisConnection) console.log("🚨 something wrong with redisConnection");
+  const currentTime = new Date();
+  const timeToScheduleJob = new Date(endTime.getTime() - 5 * 60 * 1000); // 5min before war ends
+  const delayInMs = timeToScheduleJob.getTime() - currentTime.getTime();
+
+  await collectClanWarData.add(
     "collectClanWarInfo",
-    async (job: { id: any }) => {
-      console.log("🥇 Adding my Job");
-      // Simulate work
-      await new Promise((resolve) => setTimeout(resolve, 2000)); // Simulate 2 seconds of work
-      return { result: "Job completed successfully" };
-    },
-    { removeOnComplete: true, removeOnFail: true, delay: 1000 }
+    { clanTag },
+    { removeOnComplete: true, removeOnFail: true, delay: delayInMs }
   );
-  getQueueJobs();
 }
-addJobb();
+
+/**
+ *
+ * @param jobName string collectClanWarInfo | monkey | banana
+ * @param clanTag string
+ */
+export async function doesJobExistsForCollectClanWarData(jobName: string = "collectClanWarInfo", clanTag: string) {
+  const jobs = await collectClanWarData.getJobs(["waiting"]);
+
+  const specificJobExists = jobs.some((job) => job.name === jobName && job.data.clanTag === clanTag);
+  return specificJobExists;
+}
 
 /*
 This function only console.log jobs in the queue for me o see. It has nothing to do wih my main goal 🥅
 */
 async function getQueueJobs() {
   try {
-    const waitingJobs = await testQueue.getJobs("waiting");
-    const activeJobs = await testQueue.getJobs("active");
-    const completedJobs = await testQueue.getJobs("completed");
-    const failedJobs = await testQueue.getJobs("failed");
-    const delayedJobs = await testQueue.getJobs("delayed");
-    const allJobs = await testQueue.getJobs(["waiting", "active", "completed", "failed", "delayed"]);
+    const waitingJobs = await collectClanWarData.getJobs("waiting");
+    const activeJobs = await collectClanWarData.getJobs("active");
+    const completedJobs = await collectClanWarData.getJobs("completed");
+    const failedJobs = await collectClanWarData.getJobs("failed");
+    const delayedJobs = await collectClanWarData.getJobs("delayed");
+    const allJobs = await collectClanWarData.getJobs(["waiting", "active", "completed", "failed", "delayed"]);
 
     console.log("🥉 Looking at the state of the job");
     waitingJobs.forEach((job) => {

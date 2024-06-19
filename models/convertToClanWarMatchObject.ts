@@ -3,6 +3,11 @@ import { findMatchWinner } from "../utils/helpers/foundMatchWinner";
 import { getAttackPercentage } from "../utils/helpers/getAttackPercentage";
 import { ClanWarMatchObject, Supercell_CurrrentClanWarData } from "./types/clanWarObject.types";
 
+/**
+ * @description This function converts the response from the supercell API to a ClanWarMatchObject that we can store in our database.
+ * @param clanWarData The response from the supercell API | /clans/{clanTag}/currentwar
+ * @returns
+ */
 export function convertToClanWarMatchObject(clanWarData: Supercell_CurrrentClanWarData): ClanWarMatchObject {
   return {
     seasonYear: convertToCorrectDateObject(clanWarData.startTime).getFullYear(),

@@ -10,7 +10,7 @@ export async function isClanAtWar_superCell(clanTag: string) {
     });
 
     const data = await response.json();
-    if (data.state === "inWar") return data;
+    if (data.state === "inWar" || data.state === "preparations") return data;
     return data;
   } catch (err) {
     console.log("🚨 ", err);

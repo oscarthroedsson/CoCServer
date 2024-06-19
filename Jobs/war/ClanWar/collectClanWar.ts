@@ -1,71 +1,72 @@
 import { getCurrentWar_superCell } from "../../../API/War/war_Api";
+import { addJobb_collectClanWarData, doesJobExistsForCollectClanWarData } from "../../../Queues";
 import { onBoardClanAndMembers } from "../../../middlewares/Onboarding/clan_Onboarding";
+import { convertToClanWarAttackObject } from "../../../models/convertToClanWarAttackObjec";
 import { convertToClanWarMatchObject } from "../../../models/convertToClanWarMatchObject";
+import {
+  checkIfClansMatchObjectExist_clashyStats,
+  createClanWarMatch_clashyStats,
+  storeClanWarAttack_clashyStats,
+} from "../../../service/clanWar/clanWar_service";
+import { ClanWarMemberObject_Supercell, ClanWarObject_Supercell } from "../../../types/Clan/clanObject_Supercell.types";
+import { convertToCorrectDateObject } from "../../../utils/helpers/converToCorrectDateObj";
 import { doesClanExist_clashyStats } from "../../../validation/Clan/doesClanExist";
 
-export async function collectClanWar() {
+/**
+ * @description Collects data from the current clan war and stores it in the database. This function should be run in an loop or get one clan at a time.
+ * @param clanTag
+ * @returns void
+ */
+export async function collectClanWar(clanTag: string) {
   console.log("🏰 collectClanWar körs");
-  const clanTag = "#2QJ2QG29R";
+  const clan_Tag = "#2QUCRRJYL";
 
   // get current clan war data
-  const clanWarData = await getCurrentWar_superCell(clanTag);
+  const clanWarData: ClanWarObject_Supercell = await getCurrentWar_superCell(clan_Tag);
+  const seasonYear: number = convertToCorrectDateObject(clanWarData.endTime).getFullYear();
+  const seasonMonth: number = convertToCorrectDateObject(clanWarData.endTime).getMonth();
+
+  const clans = [clanWarData.clan, clanWarData.opponent];
 
   // validate if clan exist in our DB, if not → add them and their members to our DB
-  [clanWarData.clan, clanWarData.opponent].forEach(async (clan) => {
+  for (const clan of clans) {
     const clanExist = await doesClanExist_clashyStats(clan.tag);
+    console.log("🕵🏼‍♂️🔍 Clan exist?:", clanExist);
     if (!clanExist) {
-      await onBoardClanAndMembers(clan);
+      console.log("🚢 Onboarding Clan And Members");
+      await onBoardClanAndMembers({ tag: clan.tag, name: clan.name, members: clan.members });
     }
+  }
+
+  /*
+  Validate if we already have a match object with the clans in the current war. 
+  When we run this function the first time, we will add both clans in the war and the members attacks. Therfore, if we run this a seconed time on we dont dublicate and get an error.
+  */
+  for (const clan of clans) {
+    const matchObjectOfOpponentExist = await checkIfClansMatchObjectExist_clashyStats(
+      clan.tag,
+      seasonYear,
+      seasonMonth
+    );
+    console.log("🏰 Match objet exist?:", matchObjectOfOpponentExist);
+    if (matchObjectOfOpponentExist) return;
+  }
+
+  // convert clanWarData to a clanWarMatch object that we can add to our DB
+  const clanWarMatchObject = convertToClanWarMatchObject(clanWarData);
+
+  if (!clanWarMatchObject) return; // todo Skicka mail till mig själv att det inte gick att göra om objektet
+  const { id } = await createClanWarMatch_clashyStats(clanWarMatchObject);
+  console.log("🏰 id", id);
+
+  // 🍭 Loop over clan and opponents member and collect attackobjects
+  const clanMembersAttacks = clanWarData.clan.members.flatMap((player: ClanWarMemberObject_Supercell) => {
+    return convertToClanWarAttackObject(id, player);
   });
 
-  // check if opponent is scheduled for a in our queue for job, if not → Check if we already have collected DATA on the opponent
-
-  // → → If not, add them to our DB and collect data -> Send also e-mail that checkIfClanIsAtWar didn´t add them to the DB and scheduale a job on them in the beginning of the war
-
-  // collect clanMatch info
-  const clanWarMatchObject = convertToClanWarMatchObject(clanWarData);
-  console.log("👨🏼‍⚖️ clanWarMatchObject", clanWarMatchObject);
-  // const {id} = await addClanWarMatchToDB(clanWarMatchObject);
-
-  // 🍭 Loop over clan.members
-  // check players attacks
-  // → If no attacks have been made, send in to a function that create a playerAttack object for clan War
-  // → If attacks exist, means player did attack
-  // → → 🍭 Loop over attacks becuase there can be two attacks per player
-  // → → → send to a function that create a playerAttack object for clan War
-  // → → → add it to DB.
-  // → → → Check if key "defenderTag" exist, if not, the player has not been attacked
-  // → → → send in to a function that create a playerAttack object for clan War
+  const opponentMembersAttacks = clanWarData.clan.members.flatMap((player: ClanWarMemberObject_Supercell) => {
+    return convertToClanWarAttackObject(id, player);
+  });
+  const allAttacks = [...clanMembersAttacks, ...opponentMembersAttacks];
+  await storeClanWarAttack_clashyStats(allAttacks);
 }
-
-/*
-🏰 ClanWarMatch Object
-seasonYear: convertToCorrectDateObject(clanWarData.startTime).getFullYear(
-seasonMonth: convertToCorrectDateObject(clanWarData.startTime).getMonth()
-clanOneTag: clanWarData.clan.tag
-clanTwoTag: clanWarData.opponent.tag
-clanOneStats: {
-stars: clanWarData.clan.stars
-attacks: clanWarData.clan.attacks
-attackPercentage: clanWarData.clan.attacks.length / clanWarData.teamSize*2 
-destructionPercentage: clanWarData.clan.destructionPercentage
-}
-clanTwoStats:{
-stars: clanWarData.opponent.stars
-attacks: clanWarData.opponent.attacks
-destructionPercentage: clanWarData.opponent.destructionPercentage
-}
-teamSize: clanWarData.teamSize
-winner: 
-*/
-
-/*
-🍡 ClanWarAttack Object 
-attackerPlayerTag:         player.tag
-defenderPlayerTag:         player.opponentAttacks >= 1 ? opponentAttacks.attackerTag : null
-stars:                     player.stars //→ looping over members array on clanWarData          
-destructionPercentage:     player.destructionPercentage 
-duration                   player.duration
-attacks                    player.attacks.length
-gotAttacked                player.opponentAttacks >= 1 ? true : false
-*/

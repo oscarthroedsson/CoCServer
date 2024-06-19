@@ -1,4 +1,5 @@
 import { isClanAtWar_superCell } from "../../../API/War/war_Api";
+import { addJobb_collectClanWarData } from "../../../Queues";
 import { getAllClans_clashyStats } from "../../../service/Clan/clan_service";
 import { convertToCorrectDateObject } from "../../../utils/helpers/converToCorrectDateObj";
 
@@ -11,9 +12,17 @@ export async function checkIfClanIsAtWar() {
     console.log("checking:", count);
     count++;
 
-    const data = await isClanAtWar_superCell(tag.clanTag);
+    const clanWarData = await isClanAtWar_superCell(tag.clanTag);
+    if (clanWarData.state !== "inWar" || clanWarData.state !== "preparation") continue;
 
-    if (data.state !== "inWar" || data.state !== "preparation") continue;
+    const endTime = convertToCorrectDateObject(clanWarData.endTime).fulldate;
+
+    // scheduale job for both the clan and the opponent
+    [clanWarData.clan, clanWarData.opponent].forEach(async (clan) => {
+      // todo | Validate if the clans exits and if not, collect save clan and their members to our DB
+
+      await addJobb_collectClanWarData(endTime, clan.tag);
+    });
 
     // check if opponent is in our DB B
     // → if not, add them to our DB and add a job on the clan manually so we also collect war info on them.

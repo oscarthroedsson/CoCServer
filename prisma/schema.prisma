@@ -17,7 +17,7 @@ datasource db {
 model User {
   id                       Int                               @id @default(autoincrement()) @db.UnsignedInt
   gameTag                  String                            @unique
-  gameName                 String                            @unique
+  gameName                 String
   clanTag                  String? // clanTag can be either a String or null
   totalDonations           Int?                              @default(0) // totalDonations can be either an Int or null
   totalDonationsReceived   Int?                              @default(0) // totalDonationsReceived can be either an Int or null
@@ -134,14 +134,14 @@ model ClanWarLeagueMatch {
 model ClanWarLeagueAttack {
   id                    Int                @id @default(autoincrement())
   attackerPlayerTag     String
-  defenderPlayerTag     String
+  defenderPlayerTag     String?
   stars                 Int
   destructionPercentage Float
   duration              Int
   matchId               Int
   gotAttacked           Boolean
   attacker              User               @relation("attacker", fields: [attackerPlayerTag], references: [gameTag])
-  defender              User               @relation("defender", fields: [defenderPlayerTag], references: [gameTag])
+  defender              User?              @relation("defender", fields: [defenderPlayerTag], references: [gameTag])
   match                 ClanWarLeagueMatch @relation(fields: [matchId], references: [id])
 }
 
@@ -162,23 +162,17 @@ model ClanWarMatch {
   ClanWarAttack ClanWarAttack[]
 }
 
-//match stats/json {
-// "stars": 43,
-// "attacks": 15,
-// "destructionPercentage": 98.53333333333332
-
 model ClanWarAttack {
-  id                    Int     @id @default(autoincrement())
+  id                    Int          @id @default(autoincrement())
   matchId               Int
   attackerPlayerTag     String
-  defenderPlayerTag     String
+  defenderPlayerTag     String?
   stars                 Int
   destructionPercentage Float
   duration              Int
-  attacks               Int // 0 - 1 - 2 
+  attacks               Int
   gotAttacked           Boolean
-
-  attacker User         @relation("attacker", fields: [attackerPlayerTag], references: [gameTag])
-  defender User         @relation("defender", fields: [defenderPlayerTag], references: [gameTag])
-  match    ClanWarMatch @relation(fields: [matchId], references: [id])
+  attacker              User         @relation("attacker", fields: [attackerPlayerTag], references: [gameTag])
+  defender              User?        @relation("defender", fields: [defenderPlayerTag], references: [gameTag])
+  match                 ClanWarMatch @relation(fields: [matchId], references: [id])
 }

@@ -16,11 +16,13 @@ export async function onBoardClanMembers(clanTag: string) {
   const clan = await getClan_superCell(clanTag);
   for (const member of clan.memberList) {
     const memberExist = await doesPlayerExist_clashyStats(member.tag);
+    console.log("1. 🍷", member.tag, member.name, "🧙🏼 Existierar:", memberExist);
 
     if (!memberExist) {
       const playerObject = await getPlayer_superCell(member.tag);
 
       if (playerObject) {
+        console.log("Adding " + playerObject.name);
         await registerPlayer_clashyStats({
           gameTag: playerObject.tag,
           clanTag: playerObject.clan.tag,
@@ -29,7 +31,7 @@ export async function onBoardClanMembers(clanTag: string) {
           acceptTerms: false,
         });
 
-        console.log(`Added: ${playerObject.tag} ${playerObject.name}`);
+        console.log(`🥳 Added: ${playerObject.tag} ${playerObject.name}`);
       }
     }
   }
@@ -72,11 +74,13 @@ export async function onBoardClanAndMembers(clans: ClanObject | ClanObject[]) {
         onBoardClanMemberRegister(clan.tag);
         console.log("🍷 Clan added to DB", clan.tag, " ", clan.name);
       }
-      onBoardClanMembers(clan.tag);
+
+      await onBoardClanMembers(clan.tag);
     }
     // Not an array
   } else {
     const clanExist = await doesClanExist_clashyStats(clans.tag);
+
     if (!clanExist) {
       await registerClan_clashyStats({
         tag: clans.tag,
@@ -85,7 +89,8 @@ export async function onBoardClanAndMembers(clans: ClanObject | ClanObject[]) {
 
       onBoardClanMemberRegister(clans.tag);
     }
-    onBoardClanMembers(clans.tag);
+
+    await onBoardClanMembers(clans.tag);
   }
 
   console.log("🏆 Done onboarding");
