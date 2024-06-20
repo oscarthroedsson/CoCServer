@@ -4,7 +4,8 @@ import { addClanMemberRecord } from "../../service/Clan/clan_service";
 import { registerClan_clashyStats } from "../../service/Register/registerClan_service";
 
 import { registerPlayer_clashyStats } from "../../service/Register/registerPlayer_service";
-import { ClanMemberRecordObject } from "../../service/types/clanService.types";
+import { ClanMemberRecordObject } from "../../types/ClashyStats/clanMemberRecord.types";
+
 import { doesClanExist_clashyStats } from "../../validation/Clan/doesClanExist";
 import { doesPlayerExist_clashyStats } from "../../validation/Player/doesPlayerExist";
 

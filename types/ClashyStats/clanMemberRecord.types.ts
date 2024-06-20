@@ -1,3 +1,12 @@
+export interface ClanMemberRecord {
+  clanTag: string;
+  clanMembers: any;
+}
+
+export interface ClanMemberRecordObject {
+  gameTag: string;
+  gameName: string;
+}
 export interface leaveAndJoinClanHistoryObject {
   id?: number;
   clanTag: string;

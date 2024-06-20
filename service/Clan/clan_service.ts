@@ -1,9 +1,13 @@
-import { Prisma } from "@prisma/client";
 import prisma from "../../prisma";
-import { ClanMemberRecord } from "../types/clanService.types";
-import { ClanHistoryEntry, leaveAndJoinClanHistoryObject } from "../../Jobs/types/clan/jobsClan.types";
+import {
+  ClanHistoryEntry,
+  ClanMemberRecord,
+  leaveAndJoinClanHistoryObject,
+} from "../../types/ClashyStats/clanMemberRecord.types";
+import { Clan_clashyStats } from "../../types/ClashyStats/clan.types";
+import { LatestClanMembers } from "../../types/ClashyStats/latestClanMembers.types";
 
-export async function getAllClans_clashyStats() {
+export async function getAllClans_clashyStats(): Promise<{ clanTag: string }[]> {
   try {
     const clans = await prisma.clan.findMany({
       select: {
@@ -58,7 +62,7 @@ export async function updateClanMemberRecord(clan: ClanMemberRecord) {
   }
 }
 
-export async function getClanMemberRecord(clanTag: string) {
+export async function getLatestClanMemberRecord_clashyStats(clanTag: string): Promise<LatestClanMembers | null> {
   try {
     const clanMembers = await prisma.latestClanMembers.findUnique({
       where: {
@@ -66,10 +70,12 @@ export async function getClanMemberRecord(clanTag: string) {
       },
     });
 
+    //@ts-ignore - TS wont reconize the members type- it conflicts with prisma-schema
     return clanMembers;
   } catch (error) {
     //todo → Email should be send to oscar.throedsson@gmail.com
     console.error("Error while getting clan members:", error);
+    return null;
   }
 }
 

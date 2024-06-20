@@ -1,22 +1,26 @@
-import { getClan_superCell } from "../../../API/Clan/clan_Api";
+import { getClan_superCell } from "../../API/Clan/clan_Api";
 import {
   getAllClans_clashyStats,
-  getClanMemberRecord,
   getJoinedAndLeaveClanHistory,
+  getLatestClanMemberRecord_clashyStats,
   storeJoinedAndLeaveClanHistory,
-  updateClanMemberRecord,
   updateJoinedAndLeaveClanHistory,
+} from "../../service/Clan/clan_service";
+import { ClanMemberRecordObject, MemberShipChangesObject } from "../../types/ClashyStats/clanMemberRecord.types";
+import {
+  ClanMemberHistoryObject,
+  LatestClanMembers,
+  LatestClanMembersObject,
+} from "../../types/ClashyStats/latestClanMembers.types";
 
-  // updateJoinedAndLeaveClanHistory,
-} from "../../../service/Clan/clan_service";
-import { ClanMemberRecordObject } from "../../../service/types/clanService.types";
-
-import { MemberShipChangesObject } from "../types/clan/jobsClan.types";
-
+/**
+ * @description Will look who leavees and join the clan
+ * @returns void
+ */
 export async function job_leavesAndJoinsClan() {
-  const clanTags = await getAllClans_clashyStats();
-  const dateToday = new Date();
-  const formattedDate = dateToday.toISOString().split("T")[0].toString();
+  const clanTags = await getAllClans_clashyStats(); // get all clans from the database
+  const dateToday = new Date(); // get todays date
+  const formattedDate = dateToday.toISOString().split("T")[0].toString(); // format the date to a string
   const newRecord: MemberShipChangesObject[] = [];
 
   /*
@@ -25,7 +29,7 @@ export async function job_leavesAndJoinsClan() {
 
   for (const clanTag of clanTags) {
     // get latest list of members
-    const previousMemberList = await getClanMemberRecord(clanTag.clanTag);
+    const previousMemberList = await getLatestClanMemberRecord_clashyStats(clanTag.clanTag);
     if (!previousMemberList) {
       throw new Error("No member record found");
     }
@@ -35,7 +39,7 @@ export async function job_leavesAndJoinsClan() {
     /*
     If current member cant´t be found, it means that the member has left the clan
     */
-    for (const member of previousMemberList?.members as ClanMemberRecordObject[]) {
+    for (const member of previousMemberList?.members as LatestClanMembersObject[]) {
       const stillInClan = currentMembersList.memberList.find((m: any) => member.gameName === m.name);
 
       const found = stillInClan != undefined;

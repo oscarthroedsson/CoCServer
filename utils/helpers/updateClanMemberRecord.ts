@@ -1,8 +1,9 @@
 import { getClan_superCell } from "../../API/Clan/clan_Api";
 import { getAllClans_clashyStats, updateClanMemberRecord } from "../../service/Clan/clan_service";
-import { ClanMemberRecord, ClanMemberRecordObject } from "../../service/types/clanService.types";
-import { MemberListObject_Supercell } from "../../types/Clan/clanObject_Supercell.types";
+import { ClanMemberRecord, ClanMemberRecordObject } from "../../types/ClashyStats/clanMemberRecord.types";
+
 import { PlayerObjectResponse } from "../../types/Player/PlayerObject.types";
+import { MemberListObject_Supercell } from "../../types/Supercell/clan.types";
 
 export async function generateClanMemberRecord(): Promise<void> {
   // takes the clanMembers and update it every 6 hours.
@@ -13,7 +14,7 @@ export async function generateClanMemberRecord(): Promise<void> {
     const clanMembers = await getClan_superCell(clanTag.clanTag); // get clan data
 
     // loop threw all clan members and add them to the members array
-    clanMembers.memberList.forEach((member: PlayerObjectResponse) => {
+    clanMembers.memberList.forEach((member: MemberListObject_Supercell) => {
       members.push({
         gameTag: member.tag,
         gameName: member.name,

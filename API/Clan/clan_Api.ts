@@ -1,4 +1,4 @@
-import { ClanObject } from "../../types/Clan/clanObject_Supercell.types";
+import { ClanObject } from "../../types/Supercell/clan.types";
 import { changeToURLencoding } from "../../utils/helpers/urlEncoding";
 
 export async function getClan_superCell(clanTag: string): Promise<ClanObject> {

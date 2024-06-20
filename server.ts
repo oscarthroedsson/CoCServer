@@ -5,6 +5,7 @@ import routes from "./routes";
 import dotenv from "dotenv";
 import { scheduleJobs } from "./Jobs/scheduleJobs";
 import { collectClanWar } from "./Jobs/war/ClanWar/collectClanWar";
+import { job_collectClanCapitalData } from "./Jobs/clanCapital/collectClanCapitalData";
 // import "./Queues/index";
 
 dotenv.config();
@@ -17,7 +18,7 @@ app.use(morgan("dev"));
 app.use(routes);
 
 // scheduleJobs();
-collectClanWar("#2QJ2QG29R");
+job_collectClanCapitalData();
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
