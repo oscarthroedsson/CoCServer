@@ -7,11 +7,12 @@ import {
 import { Clan_clashyStats } from "../../types/ClashyStats/clan.types";
 import { LatestClanMembers } from "../../types/ClashyStats/latestClanMembers.types";
 
-export async function getAllClans_clashyStats(): Promise<{ clanTag: string }[]> {
+export async function getAllClans_clashyStats(): Promise<{ clanTag: string; clanName: string }[]> {
   try {
     const clans = await prisma.clan.findMany({
       select: {
         clanTag: true,
+        clanName: true,
       },
     });
 
@@ -28,6 +29,7 @@ export async function getAllClans_clashyStats(): Promise<{ clanTag: string }[]> 
  * @returns {Promise<void>}
  */
 export async function addClanMemberRecord(clanMembers: ClanMemberRecord) {
+  console.log("addClanMemberRecord: ", clanMembers);
   try {
     await prisma.latestClanMembers.create({
       data: {

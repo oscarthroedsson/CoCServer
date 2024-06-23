@@ -1,3 +1,4 @@
+import { get } from "http";
 import { getClan_superCell } from "../../API/Clan/clan_Api";
 import { getPlayer_superCell } from "../../API/Player/player_Api";
 import { addClanMemberRecord } from "../../service/Clan/clan_service";
@@ -8,41 +9,82 @@ import { ClanMemberRecordObject } from "../../types/ClashyStats/clanMemberRecord
 
 import { doesClanExist_clashyStats } from "../../validation/Clan/doesClanExist";
 import { doesPlayerExist_clashyStats } from "../../validation/Player/doesPlayerExist";
+import { MemberListObject_Supercell } from "../../types/Supercell/clan.types";
+
+/*
+# Onboarding 
+Onboarding
+✅ clan
+✅ clanMembers
+clanMemebersRecord
+clanAndMembers
+warLog // differ from clanWar and ClanWarLeague
+RaidCapital
+*/
 
 /**
- * @description Register all clan members to the DB, it will fetch current membersList from supercell with the clanTag
- * @param clanTag <string> - The clan tag
+ * @description Onboard a clan or clans to the DB
+ * @param clan <string> | <string[]> - The clan tag or an array of clan tags
  */
-export async function onBoardClanMembers(clanTag: string) {
-  const clan = await getClan_superCell(clanTag);
-  for (const member of clan.memberList) {
-    const memberExist = await doesPlayerExist_clashyStats(member.tag);
-    console.log("1. 🍷", member.tag, member.name, "🧙🏼 Existierar:", memberExist);
+export async function onBoard_Clan(clan: string | string[]) {
+  // Will add multiple clans
+  if (Array.isArray(clan)) {
+    for (const clanTag of clan) {
+      const clanExist = await doesClanExist_clashyStats(clanTag);
 
-    if (!memberExist) {
-      const playerObject = await getPlayer_superCell(member.tag);
-
-      if (playerObject) {
-        console.log("Adding " + playerObject.name);
-        await registerPlayer_clashyStats({
-          gameTag: playerObject.tag,
-          clanTag: playerObject.clan.tag,
-          gameName: playerObject.name,
-          email: null,
-          acceptTerms: false,
+      if (!clanExist) {
+        const clanData = await getClan_superCell(clanTag);
+        await registerClan_clashyStats({
+          tag: clanData.tag,
+          name: clanData.name,
         });
-
-        console.log(`🥳 Added: ${playerObject.tag} ${playerObject.name}`);
       }
     }
+    return;
   }
+
+  // Will add one clan
+  const clanData = await getClan_superCell(clan);
+  await registerClan_clashyStats({
+    tag: clanData.tag,
+    name: clanData.name,
+  });
 }
 
 /**
  * @description Register all clan members to the DB, it will fetch current membersList from supercell with the clanTag
  * @param clanTag <string> - The clan tag
  */
-export async function onBoardClanMemberRegister(clanTag: string) {
+export async function onBoard_ClanMembers(clanTag: string) {
+  if (!clanTag) return;
+  const clan = await getClan_superCell(clanTag);
+  const members = clan.memberList;
+
+  for (const member of members) {
+    const playerExist = await doesPlayerExist_clashyStats(member.tag);
+    if (!playerExist) {
+      const playerData = await getPlayer_superCell(member.tag);
+      await registerPlayer_clashyStats({
+        gameTag: playerData.tag,
+        email: null,
+        clanTag: playerData.clan.tag,
+        gameName: playerData.name,
+        acceptTerms: false,
+      });
+    }
+  }
+}
+
+export async function onBoard_ClanAndMembers(clan: string) {
+  await onBoard_Clan(clan);
+  await onBoard_ClanMembers(clan);
+}
+
+/**
+ * @description Register all clan members to the DB, it will fetch current membersList from supercell with the clanTag
+ * @param clanTag <string> - The clan tag
+ */
+export async function onBoard_ClanMemberRegister(clanTag: string) {
   const members: ClanMemberRecordObject[] = [];
   const clan = await getClan_superCell(clanTag);
 
@@ -56,49 +98,12 @@ export async function onBoardClanMemberRegister(clanTag: string) {
   addClanMemberRecord({ clanTag: clanTag, clanMembers: members });
 }
 
-/**
- * @description Can onboard multiple clans and their members or just one clan and its memberss
- * @param clans <Array> | <Object> - Array of clans or just one clan
- */
-export async function onBoardClanAndMembers(clans: ClanObject | ClanObject[]) {
-  if (Array.isArray(clans)) {
-    // is array
-    for (const clan of clans) {
-      const clanExist = await doesClanExist_clashyStats(clan.tag);
-
-      if (!clanExist) {
-        await registerClan_clashyStats({
-          tag: clan.tag,
-          name: clan.name,
-        });
-
-        onBoardClanMemberRegister(clan.tag);
-        console.log("🍷 Clan added to DB", clan.tag, " ", clan.name);
-      }
-
-      await onBoardClanMembers(clan.tag);
-    }
-    // Not an array
-  } else {
-    const clanExist = await doesClanExist_clashyStats(clans.tag);
-
-    if (!clanExist) {
-      await registerClan_clashyStats({
-        tag: clans.tag,
-        name: clans.name,
-      });
-
-      onBoardClanMemberRegister(clans.tag);
-    }
-
-    await onBoardClanMembers(clans.tag);
-  }
-
-  console.log("🏆 Done onboarding");
+export async function onBoard_ClanWarLog(clanTag: string) {
+  // const clanWar = await getClanWar_superCell(clanTag);
+  // const warLog = clanWar.items;
+  // addWarLog({ clanTag, warLog });
 }
 
-interface ClanObject {
-  tag: string;
-  name: string;
-  members: any[];
-}
+export async function onBoard_ClanWars() {}
+export async function onBoard_ClanWarLeagues() {}
+export async function onBoard_ClanCapitalRaids() {}

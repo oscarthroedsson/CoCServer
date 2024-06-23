@@ -7,7 +7,7 @@ import { doesClanExist_clashyStats } from "../../validation/Clan/doesClanExist";
 
 import { getClan_superCell } from "../../API/Clan/clan_Api";
 import { registerClan_clashyStats } from "../../service/Register/registerClan_service";
-import { onBoardClanMemberRegister, onBoardClanMembers } from "../../middlewares/Onboarding/clan_Onboarding";
+import { onBoard_ClanMemberRegister, onBoard_ClanMembers } from "../../middlewares/Onboarding/clan_Onboarding";
 import { getPlayer_clashyClash, updatePlayer_clashyStats } from "../../service/Player/player_service";
 
 export async function registerNewUser(req: Request<addNewMemberProps>, res: Response) {
@@ -68,7 +68,7 @@ export async function registerNewUser(req: Request<addNewMemberProps>, res: Resp
 
     if (clan.memberList.length > 0) {
       console.log("ON BOARDING CLAN");
-      onBoardClanMembers(clan.tag);
+      onBoard_ClanMembers(clan.tag);
     }
 
     const clanExist = await doesClanExist_clashyStats(playerObject.clan.tag);
@@ -82,7 +82,7 @@ export async function registerNewUser(req: Request<addNewMemberProps>, res: Resp
           name: clan.name,
         });
 
-        onBoardClanMemberRegister(clan.tag);
+        onBoard_ClanMemberRegister(clan.tag);
       } catch (err) {
         res.status(200).send({
           status: "error",

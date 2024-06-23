@@ -4,9 +4,7 @@ export interface ClanCapital_clashyStats {
   clanName: string;
   clan: string;
   totalRaids: number;
-  seasonYear: number;
-  seasonMonth: number;
-  raids: ClanCapitalRaid_clashyStats[];
+  raids?: ClanCapitalRaid_clashyStats[];
 }
 
 export interface ClanCapitalRaid_clashyStats {

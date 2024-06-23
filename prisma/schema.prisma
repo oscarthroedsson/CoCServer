@@ -181,51 +181,77 @@ model ClanWarAttack {
 // ---------------------------------------- 🏔️ CLAN CAPITAL TABLES --------------------------------------------------
 
 // is a row for every season(month)
+//? lägga till raidsCompleted här? 
 model CapitalRaids {
-  id         Int           @id @default(autoincrement())
-  clanTag    Int
-  clanName   String
-  clan       Clan          @relation(fields: [clanTag], references: [id])
-  totalRaids String
-  raids      CapitalRaid[]
+  id       Int    @id @default(autoincrement())
+  clanTag  String @unique
+  clanName String
+  clan     Clan   @relation(fields: [clanTag], references: [clanTag])
 
-  @@map("capital_raids")
+  seasonYear  Int
+  seasonMonth Int
+
+  capitalTotalLoot        Int
+  raidsCompleted          Int
+  totalAttacks            Int
+  enemyDistrictsDestroyed Int
+  offensiveReward         Int
+  defensiveReward         Int
+  totalRaids              Int
+
+  raids CapitalRaid[] // Relation till array av CapitalRaid
+
+  @@map("CapitalRaids")
 }
 
 // Is a row for every week of the season (Fre - Mon)
 model CapitalRaid {
-  id                      Int                 @id @default(autoincrement())
-  clanTag                 String
-  clanName                String
-  defender                String
-  enemyDistrictsDestroyed Int
-  raidsCompleted          Int
-  offensiveReward         Int
-  defensiveReward         Int
-  seasonYear              Int
-  seasonMonth             Int
-  raid                    Int
-  numberOfAttacks         Int
-  attacks                 CapitalRaidAttack[]
-
+  id             Int @id @default(autoincrement())
   capitalRaidsId Int
-  capitalRaids   CapitalRaids @relation(fields: [capitalRaidsId], references: [id])
+  raid           Int
 
-  @@map("capital_raid")
+  clanTag  String
+  clanName String
+  defender String
+
+  attacksMade             Int
+  numOfDistricts          Int
+  enemyDistrictsDestroyed Int
+
+  districts    CapitalDistricts[] // Relat array av DistrictsAttacksDistrictsAttacks
+  capitalRaids CapitalRaids       @relation(fields: [capitalRaidsId], references: [id])
+
+  @@map("CapitalRaid")
 }
 
-// is a object for one single attack in a raid
-model CapitalRaidAttack {
-  id            Int         @id @default(autoincrement())
-  playerName    String
-  playerTag     String
-  district      String
-  destruction   Int
-  starsReached  Int
-  seasonYear    Int
-  seasonMonth   Int
-  capitalRaidId Int
-  capitalRaid   CapitalRaid @relation(fields: [capitalRaidId], references: [id])
+model CapitalDistricts {
+  id                 Int    @id @default(autoincrement())
+  capitalRaidId      Int
+  district           String
+  destructionPercent Float
+  attackCount        Int
 
-  @@map("capital_raid_attack")
+  attacks     CapitalDistrictAttacks[]
+  capitalRaid CapitalRaid              @relation(fields: [capitalRaidId], references: [id])
+
+  @@map("CapitalDistricts")
+}
+
+model CapitalDistrictAttacks {
+  id                 Int @id @default(autoincrement())
+  capitalDistrictsId Int
+  attack             Int
+
+  playerName   String
+  playerTag    String
+  districtName String
+  destruction  Int
+  starsReached Int
+
+  seasonYear  Int
+  seasonMonth Int
+
+  district CapitalDistricts @relation(fields: [capitalDistrictsId], references: [id])
+
+  @@map("CapitalDistrictAttacks")
 }

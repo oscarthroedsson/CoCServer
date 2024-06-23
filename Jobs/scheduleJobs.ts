@@ -55,5 +55,16 @@ export function scheduleJobs() {
     }
   );
 
+  cron.schedule(
+    cronExecutionTime.Every_Monday,
+    async () => {
+      // Collect all the clans we have in the database
+      // Check their Clan Capital Data
+      // Add all clans and members to the DB
+      // THEN RUN THE JOB
+    },
+    {}
+  );
+
   console.log("⏰ | Jobs are scheduled!");
 }

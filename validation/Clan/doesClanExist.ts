@@ -1,11 +1,14 @@
 import prisma from "../../prisma";
+import { changeToURLencoding } from "../../utils/helpers/urlEncoding";
 
 export async function doesClanExist_clashyStats(clanTag: string): Promise<boolean> {
-  console.log("2. Checking if clan exists:", clanTag);
+  console.log("clanTag: ", clanTag);
+  const convertedClanTag = changeToURLencoding(clanTag);
+  console.log("2. Checking if clan exists:", convertedClanTag);
   try {
     const clan = await prisma.clan.findUnique({
       where: {
-        clanTag: clanTag,
+        clanTag: convertedClanTag,
       },
     });
 

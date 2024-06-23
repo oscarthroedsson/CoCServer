@@ -1,3 +1,11 @@
+/*
+# Any means that  we should build a new interface for it. 
+*/
+
+export interface ClanCapitalRaidResponse_superCell {
+  items: ClanCapitalRaid_superCell[];
+}
+
 export interface ClanCapitalRaid_superCell {
   state: string;
   startTime: string;
@@ -8,11 +16,13 @@ export interface ClanCapitalRaid_superCell {
   enemyDistrictsDestroyed: number;
   offensiveReward: number;
   defensiveReward: number;
-  members: ClanCapitalSummaryPlayer_superCell[];
-  attacks: string;
+  members: ClanCapitalMembers_superCell[];
+  attackLog: ClanCapitalAttackLog_superCell[];
+  defenseLog: any;
 }
 
-export interface ClanCapitalSummaryPlayer_superCell {
+/* 🔑 Members Key on the response */
+export interface ClanCapitalMembers_superCell {
   tag: string;
   name: string;
   attacks: number;
@@ -21,20 +31,34 @@ export interface ClanCapitalSummaryPlayer_superCell {
   capitalResourcesLooted: number;
 }
 
-export interface ClanCapitalRaidAttacks_superCell {
+export interface ClanCapitalAttackLog_superCell {
   defender: ClanCapitalDefender_superCell;
   attackCount: number;
   districtCount: number;
   districtsDestroyed: number;
+  districts: ClanCapitalDistricts_superSell[];
 }
 
-export interface ClanCapitalDefender_superCell {
-  tag: string;
-  name: string;
-  level: number;
+export interface ClanCapitalDistrictAttack_superCell {
+  attacker: { tag: string; name: string };
+  destructionPercent: number;
+  stars: number;
 }
 
-export interface ClanCapitalDistrictTakeDowns_superCell {
+/*
+🔑 DefendeLog Key on the response
+*/
+
+export interface ClanCapitalDefenseLog_superCell {
+  attacker: ClanCapitalDefender_superCell;
+  attackCount: number;
+  districtCount: number;
+  districtsDestroyed: number;
+  districts: ClanCapitalDistricts_superSell;
+}
+
+/* 🔑 Exist on multiple keys in the respone */
+export interface ClanCapitalDistricts_superSell {
   id: number;
   name: string;
   districtHallLevel: number;
@@ -44,9 +68,8 @@ export interface ClanCapitalDistrictTakeDowns_superCell {
   totalLooted: number;
   attacks: ClanCapitalDistrictAttack_superCell[];
 }
-
-export interface ClanCapitalDistrictAttack_superCell {
-  attacker: { tag: string; name: string };
-  destructionPercent: number;
-  stars: number;
+export interface ClanCapitalDefender_superCell {
+  tag: string;
+  name: string;
+  level: number;
 }

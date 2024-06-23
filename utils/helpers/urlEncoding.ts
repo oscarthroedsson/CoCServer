@@ -4,6 +4,7 @@
  * @returns
  */
 export function changeToURLencoding(str: string) {
+  console.log("str: ", str);
   return str.replace(/#/g, "%23");
 }
 
