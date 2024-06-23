@@ -9,7 +9,10 @@ import { ClanMemberRecordObject } from "../../types/ClashyStats/clanMemberRecord
 
 import { doesClanExist_clashyStats } from "../../validation/Clan/doesClanExist";
 import { doesPlayerExist_clashyStats } from "../../validation/Player/doesPlayerExist";
-import { MemberListObject_Supercell } from "../../types/Supercell/clan.types";
+
+import { onBoarding_ClanCapital } from "./clanCapital_Onboarding";
+import { getClanWarLog_superCell } from "../../API/War/war_Api";
+import { WarLog_ClanWarHistory, WarLog_ClanWarLeagueHistory } from "../../types/Supercell/warLog.types";
 
 /*
 # Onboarding 
@@ -75,11 +78,6 @@ export async function onBoard_ClanMembers(clanTag: string) {
   }
 }
 
-export async function onBoard_ClanAndMembers(clan: string) {
-  await onBoard_Clan(clan);
-  await onBoard_ClanMembers(clan);
-}
-
 /**
  * @description Register all clan members to the DB, it will fetch current membersList from supercell with the clanTag
  * @param clanTag <string> - The clan tag
@@ -98,12 +96,31 @@ export async function onBoard_ClanMemberRegister(clanTag: string) {
   addClanMemberRecord({ clanTag: clanTag, clanMembers: members });
 }
 
-export async function onBoard_ClanWarLog(clanTag: string) {
-  // const clanWar = await getClanWar_superCell(clanTag);
-  // const warLog = clanWar.items;
-  // addWarLog({ clanTag, warLog });
+export async function onBoard_ClanWarHistory(war: WarLog_ClanWarHistory) {}
+export async function onBoard_ClanWarLeaguesHistory(war: WarLog_ClanWarLeagueHistory) {}
+
+export async function onBoard_clanWarLogHistory(clanTag: string) {
+  const warHistory = await getClanWarLog_superCell(clanTag);
+  if (!warHistory) return;
+
+  for (const war of warHistory.items) {
+    if (war.attacksPerMember === 1 && !war.opponent.name) {
+      onBoard_ClanWarHistory(war as WarLog_ClanWarHistory);
+    } else if (war.attacksPerMember === 2 && war.opponent.name) {
+      onBoard_ClanWarLeaguesHistory(war as WarLog_ClanWarLeagueHistory);
+    }
+  }
 }
 
-export async function onBoard_ClanWars() {}
-export async function onBoard_ClanWarLeagues() {}
-export async function onBoard_ClanCapitalRaids() {}
+/**
+ * @description Do all the onboarding functions for a clan
+ * @implements onBoard_Clan, onBoard_ClanMembers, onBoard_ClanMemberRegister
+ * @param clan
+ */
+export async function onBoard_ClanAndMembers(clan: string) {
+  await onBoard_Clan(clan);
+  await onBoard_ClanMembers(clan);
+  // await onBoard_ClanMemberRegister(clan); // ✅ Tested n it works
+  // await onBoarding_ClanCapital(clan); // ✅ Tested n it works
+  await onBoard_clanWarLogHistory(clan);
+}

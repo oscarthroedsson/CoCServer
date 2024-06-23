@@ -2,7 +2,8 @@ import prisma from "../../prisma";
 import { addNewMemberProps } from "../../types/Register/Register.types";
 
 export function registerPlayer_clashyStats(newMember: addNewMemberProps) {
-  console.log("🎍 2. New member: ", newMember);
+  if (!newMember.gameTag || !newMember.gameName) return;
+
   return prisma.user.create({
     data: {
       gameTag: newMember.gameTag,

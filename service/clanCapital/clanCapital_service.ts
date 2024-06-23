@@ -34,11 +34,13 @@ export async function storeClanCapitalRaids_clashyClash(
   }
 }
 
-export async function getClanCapitalRaids_clashyClash(clanTag: string) {
+export async function getClanCapitalRaids_clashyClash(clanTag: string, year: number, month: number) {
   try {
     return await prisma.capitalRaids.findFirst({
       where: {
         clanTag: clanTag,
+        seasonYear: year,
+        seasonMonth: month,
       },
     });
   } catch (e) {
@@ -85,6 +87,7 @@ export async function storeCapitalRaidDistricts_clashyClash(data: {
   district: string;
   destructionPercent: number;
   attackCount: number;
+  totalLooted: number;
 }) {
   try {
     const result = await prisma.capitalDistricts.create({
@@ -93,6 +96,7 @@ export async function storeCapitalRaidDistricts_clashyClash(data: {
         district: data.district,
         destructionPercent: data.destructionPercent,
         attackCount: data.attackCount,
+        totalLooted: data.totalLooted,
       },
     });
     return result;

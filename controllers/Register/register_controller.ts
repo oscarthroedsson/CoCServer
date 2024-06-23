@@ -6,8 +6,7 @@ import { doesPlayerExist_clashyStats } from "../../validation/Player/doesPlayerE
 import { doesClanExist_clashyStats } from "../../validation/Clan/doesClanExist";
 
 import { getClan_superCell } from "../../API/Clan/clan_Api";
-import { registerClan_clashyStats } from "../../service/Register/registerClan_service";
-import { onBoard_ClanMemberRegister, onBoard_ClanMembers } from "../../middlewares/Onboarding/clan_Onboarding";
+import { onBoard_ClanAndMembers } from "../../middlewares/Onboarding/clan_Onboarding";
 import { getPlayer_clashyClash, updatePlayer_clashyStats } from "../../service/Player/player_service";
 
 export async function registerNewUser(req: Request<addNewMemberProps>, res: Response) {
@@ -16,17 +15,18 @@ export async function registerNewUser(req: Request<addNewMemberProps>, res: Resp
   const email = req.body.email;
   const acceptTerms = req.body.acceptTerms;
 
+  // 🚓 Validate CoC account againt superCell
   const accountIsValid = await validateClashAccount_superCell(gameTag, token, res);
   if (!accountIsValid || accountIsValid.invalid) {
     res.status(400).send({
       status: "error",
-      message: "Invalid account key",
+      message: "Invalid account or accont key",
     });
     return;
   }
+
   //look if they exists in clashy stats DB
   const userExist = await doesPlayerExist_clashyStats(gameTag);
-
   try {
     // get payload from superCell
     const playerObject = await getPlayer_superCell(gameTag);
@@ -35,13 +35,11 @@ export async function registerNewUser(req: Request<addNewMemberProps>, res: Resp
       const player = await getPlayer_clashyClash(gameTag); // get player from clashyStats database
       /*
         if player exist and email is null and acceptTerms is false we know they where added 
-        thre processClanMembers when someone else in the clan was registered
+         when someone else in the clan was registered
       */
       if (player?.email === null && player.acceptTerms === false) {
         updatePlayer_clashyStats({
-          gameTag: playerObject.tag,
-          clanTag: playerObject.clan.tag,
-          gameName: playerObject.name,
+          clanTag: playerObject.clan.tag ? playerObject.clan.tag : null,
           email: email,
           acceptTerms: acceptTerms,
         });
@@ -55,48 +53,31 @@ export async function registerNewUser(req: Request<addNewMemberProps>, res: Resp
       }
     } else {
       // if user does not exist, register user
+      if (!playerObject.clan.tag) return;
       await registerPlayer_clashyStats({
         gameTag: playerObject.tag,
-        clanTag: playerObject.clan.tag,
+        clanTag: playerObject.clan.tag ? playerObject.clan.tag : null,
         gameName: playerObject.name,
         email: email,
         acceptTerms: acceptTerms,
       });
+      res.status(200).send({
+        status: "success",
+        message: "User registered",
+      });
     }
+
+    // 🚨 We do not continue of the player aren´t in a clan
+    if (!playerObject.clan.tag) return;
 
     const clan = await getClan_superCell(playerObject.clan.tag);
+    if (!clan) return; // 🚨 Abort if something goes wrong
 
-    if (clan.memberList.length > 0) {
-      console.log("ON BOARDING CLAN");
-      onBoard_ClanMembers(clan.tag);
-    }
+    const clanExist = await doesClanExist_clashyStats(playerObject.clan.tag); // 👀 Check if the clan exist at clashyStats
+    if (clanExist) return;
 
-    const clanExist = await doesClanExist_clashyStats(playerObject.clan.tag);
-
-    if (!clanExist) {
-      try {
-        const clan = await getClan_superCell(playerObject.clan.tag);
-
-        await registerClan_clashyStats({
-          tag: clan.tag,
-          name: clan.name,
-        });
-
-        onBoard_ClanMemberRegister(clan.tag);
-      } catch (err) {
-        res.status(200).send({
-          status: "error",
-          message: "We onboarded you as a player, but not your clan.",
-          error: err,
-        });
-        return;
-      }
-    }
-
-    res.status(200).send({
-      status: "success",
-      data: playerObject,
-    });
+    //💡 Onboard both clan and the members
+    onBoard_ClanAndMembers(playerObject.clan.tag);
   } catch (error) {
     console.log("Error: ", error);
     res.status(400).send({

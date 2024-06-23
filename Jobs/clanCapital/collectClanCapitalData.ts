@@ -23,13 +23,12 @@ import {
 
 export async function job_collectClanCapitalData() {
   // get all clans from the database
-  const clanTag = "#2QJ2QG29R"; //! remove when done
   const allClans = await getAllClans_clashyStats(); //# ← use this instead of clanTag
   const presentDate = new Date(); // get the present date so we can find the raids that we are looking for.
-
   /*
   📚 We use year(YYYY) and month(MM) to divide all the data in seasons
   */
+  //? should we look on the dates on the onGoing raid instead?
   const thisYear = presentDate.getFullYear(); // get the year
   const thisMonth = presentDate.getMonth() + 1; // get the month
 
@@ -57,7 +56,7 @@ export async function job_collectClanCapitalData() {
       📚  If it doesn´t exist, it means that it is the first week and raid of the month
       */
       if (capitalRaidsExist) {
-        const capitalRaidResponse = await getClanCapitalRaids_clashyClash(clanTag);
+        const capitalRaidResponse = await getClanCapitalRaids_clashyClash(clan.clanTag, thisYear, thisMonth);
         raidID = capitalRaidResponse?.id; // save the id of the column to a global variable
       } else {
         // 📚 create the column for the month in DB, if this is the first time this function is run for the month
@@ -111,6 +110,7 @@ export async function job_collectClanCapitalData() {
             district: districts.name,
             destructionPercent: districts.destructionPercent,
             attackCount: districts.attackCount,
+            totalLooted: districts.totalLooted,
           });
 
           if (!capitalRaidDistrictsResponse?.id) break; //🚨 abort if somehting goes wrong with storing in DB- we can´t continue without the ID

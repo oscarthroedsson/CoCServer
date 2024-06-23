@@ -5,6 +5,7 @@ import { job_CollectDonationHistory } from "./player/donationHistory";
 import { job_clanCapitalContributionsHistory } from "./player/clanCapitalContributionsHistory";
 import { job_leavesAndJoinsClan } from "./clan/leavesAndJoinsClan";
 import { checkIfClanIsAtWar } from "./war/ClanWar/checkIfClanIsAtWar";
+import { job_collectClanCapitalData } from "./clanCapital/collectClanCapitalData";
 
 export function scheduleJobs() {
   cron.schedule(
@@ -55,13 +56,13 @@ export function scheduleJobs() {
     }
   );
 
+  /**
+   * @description Collects the clan capital data from the supercell API and stores it in the database
+   */
   cron.schedule(
     cronExecutionTime.Every_Monday,
     async () => {
-      // Collect all the clans we have in the database
-      // Check their Clan Capital Data
-      // Add all clans and members to the DB
-      // THEN RUN THE JOB
+      await job_collectClanCapitalData();
     },
     {}
   );

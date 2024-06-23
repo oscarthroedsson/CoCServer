@@ -184,7 +184,7 @@ model ClanWarAttack {
 //? lägga till raidsCompleted här? 
 model CapitalRaids {
   id       Int    @id @default(autoincrement())
-  clanTag  String @unique
+  clanTag  String
   clanName String
   clan     Clan   @relation(fields: [clanTag], references: [clanTag])
 
@@ -201,6 +201,7 @@ model CapitalRaids {
 
   raids CapitalRaid[] // Relation till array av CapitalRaid
 
+  @@unique([clanTag, seasonYear, seasonMonth])
   @@map("CapitalRaids")
 }
 
@@ -230,6 +231,7 @@ model CapitalDistricts {
   district           String
   destructionPercent Float
   attackCount        Int
+  totalLooted        Int?
 
   attacks     CapitalDistrictAttacks[]
   capitalRaid CapitalRaid              @relation(fields: [capitalRaidId], references: [id])
@@ -253,5 +255,6 @@ model CapitalDistrictAttacks {
 
   district CapitalDistricts @relation(fields: [capitalDistrictsId], references: [id])
 
+  @@unique([capitalDistrictsId, playerTag, districtName, attack, seasonYear, seasonMonth])
   @@map("CapitalDistrictAttacks")
 }
