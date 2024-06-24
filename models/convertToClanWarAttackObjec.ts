@@ -1,8 +1,4 @@
-import {
-  AttackObject_Supercell,
-  ClanWarMemberObject_Supercell,
-  ClanWarPlayerAttackObject_Supercell,
-} from "../types/Clan/clanObject_Supercell.types";
+import { AttackObject_Supercell, ClanWarMemberObject_Supercell } from "../types/Supercell/clanWar.types";
 
 /**
  * @description This function should be used with a flatMap.
@@ -22,13 +18,16 @@ export function convertToClanWarAttackObject(matchId: number, playerData: ClanWa
         destructionPercentage: 0,
         duration: 0,
         attacks: 0,
+        attack: 0,
         gotAttacked: playerData.opponentAttacks >= 1 ? true : false,
       },
     ];
   }
 
+  // need to do this, TS does not understand "hasOwnProperty" and belive that attack till can be underfined
+
   // The player did attack
-  return playerData.attacks.map((attack: AttackObject_Supercell) => {
+  return playerData.attacks.map((attack: AttackObject_Supercell, index: number) => {
     return {
       matchId: matchId,
       attackerPlayerTag: attack.attackerTag,
@@ -37,6 +36,7 @@ export function convertToClanWarAttackObject(matchId: number, playerData: ClanWa
       destructionPercentage: attack.destructionPercentage,
       duration: attack.duration,
       attacks: playerData.attacks?.length ?? 0,
+      attack: index + 1,
       gotAttacked: playerData.opponentAttacks >= 1 ? true : false,
     };
   });

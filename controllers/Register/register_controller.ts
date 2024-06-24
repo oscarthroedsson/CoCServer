@@ -53,7 +53,7 @@ export async function registerNewUser(req: Request<addNewMemberProps>, res: Resp
       }
     } else {
       // if user does not exist, register user
-      if (!playerObject.clan.tag) return;
+
       await registerPlayer_clashyStats({
         gameTag: playerObject.tag,
         clanTag: playerObject.clan.tag ? playerObject.clan.tag : null,
@@ -72,7 +72,6 @@ export async function registerNewUser(req: Request<addNewMemberProps>, res: Resp
 
     const clan = await getClan_superCell(playerObject.clan.tag);
     if (!clan) return; // 🚨 Abort if something goes wrong
-
     const clanExist = await doesClanExist_clashyStats(playerObject.clan.tag); // 👀 Check if the clan exist at clashyStats
     if (clanExist) return;
 

@@ -16,7 +16,7 @@ export async function doesClanCapitalRaidExits_clashyClash(
   clanName: string,
   defender: string
 ): Promise<boolean> {
-  const foundClan = await prisma.capitalRaid.findUnique({
+  const foundClan = await prisma.capitalRaid.findFirst({
     where: {
       id: id,
       clanName: clanName,

@@ -1,14 +1,13 @@
 import { getCurrentWar_superCell } from "../../../API/War/war_Api";
-import { addJobb_collectClanWarData, doesJobExistsForCollectClanWarData } from "../../../Queues";
-import { onBoardClanAndMembers } from "../../../middlewares/Onboarding/clan_Onboarding";
+import { onBoard_ClanAndMembers } from "../../../middlewares/Onboarding/clan_Onboarding";
 import { convertToClanWarAttackObject } from "../../../models/convertToClanWarAttackObjec";
 import { convertToClanWarMatchObject } from "../../../models/convertToClanWarMatchObject";
 import {
   checkIfClansMatchObjectExist_clashyStats,
-  createClanWarMatch_clashyStats,
+  storeClanWarMatch_clashyStats,
   storeClanWarAttack_clashyStats,
 } from "../../../service/clanWar/clanWar_service";
-import { ClanWarMemberObject_Supercell, ClanWarObject_Supercell } from "../../../types/Clan/clanObject_Supercell.types";
+import { ClanWarMemberObject_Supercell, ClanWarObject_Supercell } from "../../../types/Supercell/clanWar.types";
 import { convertToCorrectDateObject } from "../../../utils/helpers/converToCorrectDateObj";
 import { doesClanExist_clashyStats } from "../../../validation/Clan/doesClanExist";
 
@@ -25,6 +24,8 @@ export async function collectClanWar(clanTag: string) {
   const clanWarData: ClanWarObject_Supercell = await getCurrentWar_superCell(clan_Tag);
   const seasonYear: number = convertToCorrectDateObject(clanWarData.endTime).getFullYear();
   const seasonMonth: number = convertToCorrectDateObject(clanWarData.endTime).getMonth();
+  const startTime: Date = convertToCorrectDateObject(clanWarData.startTime).fulldate;
+  const endTime: Date = convertToCorrectDateObject(clanWarData.endTime).fulldate;
 
   const clans = [clanWarData.clan, clanWarData.opponent];
   // validate if clan exist in our DB, if not → add them and their members to our DB
@@ -32,7 +33,7 @@ export async function collectClanWar(clanTag: string) {
     const clanExist = await doesClanExist_clashyStats(clan.tag);
     if (!clanExist) {
       console.log("🚢 Onboarding Clan And Members");
-      await onBoardClanAndMembers({ tag: clan.tag, name: clan.name, members: clan.members });
+      await onBoard_ClanAndMembers(clan.tag);
     }
   }
 
@@ -41,11 +42,7 @@ export async function collectClanWar(clanTag: string) {
   When we run this function the first time, we will add both clans in the war and the members attacks. Therfore, if we run this a seconed time on we dont dublicate and get an error.
   */
   for (const clan of clans) {
-    const matchObjectOfOpponentExist = await checkIfClansMatchObjectExist_clashyStats(
-      clan.tag,
-      seasonYear,
-      seasonMonth
-    );
+    const matchObjectOfOpponentExist = await checkIfClansMatchObjectExist_clashyStats(clan.tag, startTime, endTime);
     if (matchObjectOfOpponentExist) return;
   }
 
@@ -53,14 +50,14 @@ export async function collectClanWar(clanTag: string) {
   const clanWarMatchObject = convertToClanWarMatchObject(clanWarData);
 
   if (!clanWarMatchObject) return; // todo Skicka mail till mig själv att det inte gick att göra om objektet
-  const { id } = await createClanWarMatch_clashyStats(clanWarMatchObject);
+  const { id } = await storeClanWarMatch_clashyStats(clanWarMatchObject);
 
   // 🍭 Loop over clan and opponents member and collect attackobjects
   const clanMembersAttacks = clanWarData.clan.members.flatMap((player: ClanWarMemberObject_Supercell) => {
     return convertToClanWarAttackObject(id, player);
   });
 
-  const opponentMembersAttacks = clanWarData.clan.members.flatMap((player: ClanWarMemberObject_Supercell) => {
+  const opponentMembersAttacks = clanWarData.opponent.members.flatMap((player: ClanWarMemberObject_Supercell) => {
     return convertToClanWarAttackObject(id, player);
   });
 

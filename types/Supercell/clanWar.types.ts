@@ -50,6 +50,7 @@ export interface AttackObject_Supercell {
   stars: number;
   destructionPercentage: number;
   attacks: number;
+  attack: number;
   order: number;
   duration: number;
 }

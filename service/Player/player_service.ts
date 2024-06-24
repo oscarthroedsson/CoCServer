@@ -47,3 +47,15 @@ export async function updatePlayer_clashyStats(playerObject: addNewMemberProps) 
     throw error; // Rethrow the error for error handling
   }
 }
+
+export function storePlayer_clashyStats(playerObject: PlayerProfilClashyStats) {
+  return prisma.user.create({
+    data: {
+      gameTag: playerObject.gameTag,
+      gameName: playerObject.gameName,
+      clanTag: playerObject.clanTag,
+      email: playerObject.email,
+      acceptTerms: playerObject.acceptTerms,
+    },
+  });
+}

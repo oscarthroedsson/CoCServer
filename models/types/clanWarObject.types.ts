@@ -12,6 +12,8 @@ export interface ClanWarMatchObject {
   id?: number;
   seasonYear: number;
   seasonMonth: number;
+  startTime: Date;
+  endTime: Date;
   clanOneTag: string;
   clanTwoTag: string;
   clanOneStats: ClanWarClanStats;
@@ -26,6 +28,7 @@ export interface ClanWarClanStats {
   attacks: number;
   attackPercentage: number;
   destructionPercentage: number;
+  expEarned: number;
 }
 
 export interface ClanWarMatchObjectMemberList {
@@ -46,5 +49,6 @@ export interface ClanWarAttackObject {
   destructionPercentage: number;
   duration: number;
   attacks: number;
+  attack: number;
   gotAttacked: boolean;
 }

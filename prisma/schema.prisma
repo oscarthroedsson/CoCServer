@@ -152,6 +152,8 @@ model ClanWarMatch {
   id            Int             @id @default(autoincrement())
   seasonYear    Int
   seasonMonth   Int
+  startTime     DateTime
+  endTime       DateTime
   clanOneTag    String
   clanTwoTag    String
   clanOneStats  Json
@@ -161,6 +163,8 @@ model ClanWarMatch {
   clanOne       Clan            @relation("clanOne", fields: [clanOneTag], references: [clanTag])
   clanTwo       Clan            @relation("clanTwo", fields: [clanTwoTag], references: [clanTag])
   ClanWarAttack ClanWarAttack[]
+
+  @@unique([clanOneTag, startTime, endTime])
 }
 
 model ClanWarAttack {
@@ -172,10 +176,13 @@ model ClanWarAttack {
   destructionPercentage Float
   duration              Int
   attacks               Int
+  attack                Int
   gotAttacked           Boolean
   attacker              User         @relation("attacker", fields: [attackerPlayerTag], references: [gameTag])
   defender              User?        @relation("defender", fields: [defenderPlayerTag], references: [gameTag])
   match                 ClanWarMatch @relation(fields: [matchId], references: [id])
+
+  @@unique([matchId, attackerPlayerTag, defenderPlayerTag, attack])
 }
 
 // ---------------------------------------- 🏔️ CLAN CAPITAL TABLES --------------------------------------------------
