@@ -39,6 +39,6 @@ export function convertToClanWarMatchObject(clanWarData: Supercell_CurrrentClanW
       expEarned: clanWarData.clan.expEarned,
     },
     teamSize: clanWarData.teamSize,
-    winner: findMatchWinner(clanWarData.clan, clanWarData.opponent),
+    winner: findMatchWinner(clanWarData.clan, clanWarData.opponent) ?? "",
   };
 }

@@ -119,27 +119,29 @@ model ClanWarLeagueGroupClan {
 
 model ClanWarLeagueMatch {
   id           Int                   @id @default(autoincrement())
+  groupId      Int
   round        Int
   clanOneTag   String
   clanTwoTag   String
   clanOneStats Json
   clanTwoStats Json
-  groupId      Int
   winner       String
   clanOne      Clan                  @relation("clanOne", fields: [clanOneTag], references: [clanTag])
   clanTwo      Clan                  @relation("clanTwo", fields: [clanTwoTag], references: [clanTag])
   group        ClanWarLeagueGroup    @relation(fields: [groupId], references: [id])
   attacks      ClanWarLeagueAttack[]
+
+  // Kan lägga till detta:   @@unique([groupId, round, clanOneTag, clanTwoTag, endTime]) för att förhindra dubbletter
 }
 
 model ClanWarLeagueAttack {
   id                    Int                @id @default(autoincrement())
+  matchId               Int
   attackerPlayerTag     String
   defenderPlayerTag     String?
   stars                 Int
   destructionPercentage Float
   duration              Int
-  matchId               Int
   gotAttacked           Boolean
   attacker              User               @relation("attacker", fields: [attackerPlayerTag], references: [gameTag])
   defender              User?              @relation("defender", fields: [defenderPlayerTag], references: [gameTag])

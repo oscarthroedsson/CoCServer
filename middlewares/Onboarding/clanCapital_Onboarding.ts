@@ -13,12 +13,9 @@ import {
 } from "../../validation/clanCapital/clanCapital_validation";
 
 export async function onBoarding_ClanCapital(clanTag: string) {
-  //   console.log("onBoard_ClanCapitalRaidsHistory | Is not validated and can not be used: ");
-  //   if (!clanTag) return;
-  //   if (clanTag) return;
-
-  const clan = await getClan_superCell(clanTag);
   let raidID: number | undefined = 0;
+  const clan = await getClan_superCell(clanTag);
+  if (!clan) return;
 
   // 📚 Get all Clan capital data and sort out raids that aren´t onGoing
   const clanCapitalData = await getClanCapital_superCell(clanTag);

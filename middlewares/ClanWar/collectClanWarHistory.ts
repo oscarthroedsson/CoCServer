@@ -103,21 +103,6 @@ export async function collectClanWarHistory(clanWarObject: ClanWarObject_Superce
 
   const allAttacks = [...clanMembersAttacks, ...opponentMembersAttacks];
 
-  const seenAttacks = new Set<string>();
-
-  // Loop through the opponentMembersAttacks to handle duplicates
-  for (const attack of allAttacks) {
-    if (!attack) continue;
-    const attackIdentifier = `${attack.matchId}-${attack.attackerPlayerTag}-${attack.defenderPlayerTag}`;
-
-    if (seenAttacks.has(attackIdentifier)) {
-      console.log("Duplicate found:", attack);
-    } else {
-      seenAttacks.add(attackIdentifier);
-    }
-  }
-  console.log("------------------------ All attacks processed ------------------------");
-
   for (const attack of allAttacks) {
     console.log("🪓 attack OBJECT: ", {
       matchId: attack.matchId,
@@ -135,6 +120,8 @@ export async function collectClanWarHistory(clanWarObject: ClanWarObject_Superce
     console.log("🪖 attackExits: ", attackExits);
 
     const playerExist = await doesPlayerExist_clashyStats(attack.attackerPlayerTag);
+
+    //? Tar jag bort if- så kommer vi inte kunna lägga till attackdata, fattar inte varför
     if (!playerExist) return console.log("Player does not exist in the DB", attack.attackerPlayerTag);
     console.log("playerExist: ", playerExist);
 

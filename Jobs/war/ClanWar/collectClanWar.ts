@@ -10,6 +10,8 @@ import {
 import { ClanWarMemberObject_Supercell, ClanWarObject_Supercell } from "../../../types/Supercell/clanWar.types";
 import { convertToCorrectDateObject } from "../../../utils/helpers/converToCorrectDateObj";
 import { doesClanExist_clashyStats } from "../../../validation/Clan/doesClanExist";
+import { doesPlayerExist_clashyStats } from "../../../validation/Player/doesPlayerExist";
+import { doesClanWarAttackExist_clashyStats } from "../../../validation/war/doesClanWarAttackExist";
 
 /**
  * @description Collects data from the current clan war and stores it in the database. This function should be run in an loop or get one clan at a time.
@@ -22,8 +24,6 @@ export async function collectClanWar(clanTag: string) {
 
   // get current clan war data
   const clanWarData: ClanWarObject_Supercell = await getCurrentWar_superCell(clan_Tag);
-  const seasonYear: number = convertToCorrectDateObject(clanWarData.endTime).getFullYear();
-  const seasonMonth: number = convertToCorrectDateObject(clanWarData.endTime).getMonth();
   const startTime: Date = convertToCorrectDateObject(clanWarData.startTime).fulldate;
   const endTime: Date = convertToCorrectDateObject(clanWarData.endTime).fulldate;
 
@@ -62,5 +62,29 @@ export async function collectClanWar(clanTag: string) {
   });
 
   const allAttacks = [...clanMembersAttacks, ...opponentMembersAttacks];
-  await storeClanWarAttack_clashyStats(allAttacks);
+
+  for (const attack of allAttacks) {
+    console.log("🪓 attack OBJECT: ", {
+      matchId: attack.matchId,
+      attackerPlayerTag: attack.attackerPlayerTag,
+      defenderPlayerTag: attack.defenderPlayerTag ?? null,
+      attack: attack.attack,
+    });
+
+    const attackExits = await doesClanWarAttackExist_clashyStats({
+      matchId: attack.matchId,
+      attackerPlayerTag: attack.attackerPlayerTag,
+      defenderPlayerTag: attack.defenderPlayerTag ?? null,
+      attack: attack.attack,
+    });
+    console.log("🪖 attackExits: ", attackExits);
+
+    const playerExist = await doesPlayerExist_clashyStats(attack.attackerPlayerTag);
+
+    //? Tar jag bort if- så kommer vi inte kunna lägga till attackdata, fattar inte varför
+    if (!playerExist) return console.log("Player does not exist in the DB", attack.attackerPlayerTag);
+
+    if (attackExits || !playerExist) continue;
+    await storeClanWarAttack_clashyStats(attack);
+  }
 }

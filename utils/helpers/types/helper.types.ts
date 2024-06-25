@@ -1,6 +1,6 @@
 export interface warWinnerProps {
-  clanTag: string;
-  tag: string;
+  clanTag?: string;
+  tag?: string;
   destructionPercentage: number;
   stars: number;
 }

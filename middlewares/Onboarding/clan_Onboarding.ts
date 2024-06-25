@@ -17,6 +17,8 @@ import { collectClanWarHistory } from "../ClanWar/collectClanWarHistory";
 import { getClanWarHistory_ClashKing } from "../../API/ClashKing/ClanWarHistory/clanWarHistory_clashKing";
 import { ClanWarMatchObject } from "../../models/types/clanWarObject.types";
 import { ClanWarObject_Supercell } from "../../types/Supercell/clanWar.types";
+import { ClanWarLeagueMatchObject_Supercell } from "../../types/Supercell/clanWarLeague.types";
+import { collectClanWarLeagueHistory } from "../ClanWarLeague/collectClanWarLeagueHistory";
 
 /*
 # Onboarding 
@@ -37,6 +39,7 @@ export async function onBoard_Clan(clan: string | string[]) {
   console.log("1-- onBoarding Clan: ", clan);
   // Will add multiple clans
   if (Array.isArray(clan)) {
+    const clans = [];
     for (const clanTag of clan) {
       const clanExist = await doesClanExist_clashyStats(clanTag);
 
@@ -47,13 +50,14 @@ export async function onBoard_Clan(clan: string | string[]) {
           continue;
         }
 
-        await registerClan_clashyStats({
+        const clan = await registerClan_clashyStats({
           tag: clanData.tag,
           name: clanData.name,
         });
+        clans.push(clan);
       }
     }
-    return;
+    return clans;
   }
 
   // Will add one clan
@@ -71,6 +75,7 @@ export async function onBoard_Clan(clan: string | string[]) {
     name: clanData.name,
   });
   console.log("💎 clan added", addedClan.clanName, " | ", addedClan.clanTag);
+  return addedClan;
 }
 
 /**
@@ -137,28 +142,28 @@ export async function onBoard_ClanWarHistory(warObject: ClanWarObject_Supercell)
   await collectClanWarHistory(warObject);
 }
 
-export async function onBoard_ClanWarLeaguesHistory() {}
+export async function onBoard_ClanWarLeaguesHistory(clanTag: string) {
+  if (!clanTag) return;
+  await collectClanWarLeagueHistory(clanTag);
+}
 
+//--------------------------- 👥 ONBOARDING GROUPS 👥 ---------------------------
+/* This functions onboard multiple stuffs */
 export async function onBoard_clanWarLogHistory(clanTag: string) {
   const warHistory = await getClanWarHistory_ClashKing(clanTag);
   if (!warHistory) return;
 
   const clanWars = warHistory.filter((war: ClanWarObject_Supercell) => war.hasOwnProperty("attacksPerMember"));
-  const clanWarLeagues = warHistory.filter((war: ClanWarObject_Supercell) => !war.hasOwnProperty("attacksPerMember"));
 
   for (const war of clanWars) {
     await onBoard_ClanWarHistory(war);
   }
   console.log("🧙🏼 War History added");
-
-  // for (const war of clanWarLeagues) {
-  //   await onBoard_ClanWarLeaguesHistory();
-  // }
 }
 
 /**
- * @description Do all the onboarding functions for a clan
- * @implements onBoard_Clan, onBoard_ClanMembers, onBoard_ClanMemberRegister
+ * @description Onboard: Clan, clanmembers, clanMemberRecord, clanCapital, clanWarLogHistory
+ * @implements onBoard_Clan, onBoard_ClanMembers, onBoard_ClanMemberRegister, onBoarding_ClanCapital, onBoard_clanWarLogHistory
  * @param clan
  */
 export async function onBoard_ClanAndMembers(clan: string) {
@@ -166,5 +171,7 @@ export async function onBoard_ClanAndMembers(clan: string) {
   await onBoard_ClanMembers(clan);
   // await onBoard_ClanMemberRegister(clan); // ✅ Tested n it works
   // await onBoarding_ClanCapital(clan); // ✅ Tested n it works
-  await onBoard_clanWarLogHistory(clan);
+  // await onBoard_clanWarLogHistory(clan); // ✅ clanWar works n
+  await onBoard_ClanWarLeaguesHistory(clan);
+  console.log("🚚 ✅ Onboarding Done ");
 }

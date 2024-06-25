@@ -1,4 +1,5 @@
 export interface ClanWarLeagueMatchObject_Supercell {
+  tag?: string; // from clashKing
   state: string;
   teamSize: number;
   preparationStartTime: string;
