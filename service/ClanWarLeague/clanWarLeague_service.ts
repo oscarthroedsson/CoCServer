@@ -10,161 +10,135 @@ import {
   ClanWarLeagueGroup_clashyClash,
   ClanWarLeagueMatch_clashyClash,
 } from "../../types/ClashyStats/clanWarLeague.types";
+import { connect } from "http2";
 
-// export async function getClanWarLeagueMatchs_clashyStats(warTag: string, clanTag: string) {
-//   const convertedClanTag = changeToURLencoding(clanTag);
-//   const response = await prisma.clanWarLeagueMatch.findMany({
-//     where: {
-//       clanTag: "",
-//       seasonYear: 2023,
-//       seasonMonth: 06,
-//       warTag: warTag,
-//       clanTag: convertedClanTag,
-//     },
-//   });
-// }
-
-export async function storeClanWarLeagueGroup_clashyStats(
-  year: number,
-  month: number,
-  clanTags: string[]
-): Promise<ClanWarLeagueGroup_clashyClash | null | undefined> {
-  if (clanTags.length === 0) {
-    return;
-  }
-
-  //  Create a new group
-  const newGroup = await prisma.clanWarLeagueGroup.create({
-    data: {
+export async function storeClanWarLeagueSeason_ClashyStats(year: number, month: number) {
+  return await prisma.clanWarLeagueSeason.upsert({
+    where: {
+      seasonYear_seasonMonth: {
+        seasonYear: year,
+        seasonMonth: month,
+      },
+    },
+    update: {},
+    create: {
       seasonYear: year,
       seasonMonth: month,
     },
   });
-
-  const groupClansData = clanTags.map((clanTag: string) => ({
-    clanTag: clanTag,
-    groupId: newGroup.id,
-  }));
-
-  // Lägg till alla klaner i gruppen i en transaktion
-  await prisma.$transaction(
-    groupClansData.map((data) =>
-      prisma.clanWarLeagueGroupClan.create({
-        data: data,
-      })
-    )
-  );
-  if (newGroup.id === undefined) throw new Error("newGroup.id is undefined");
-
-  return newGroup;
 }
+export async function getClanWarLeagueSeason_ClashyStats() {}
 
-export async function getClanWarLeagueGroup_clashyStats(seasonYear: number, seasonMonth: number) {
-  const group = await prisma.clanWarLeagueGroup.findFirst({
-    where: {
-      seasonYear: seasonYear,
-      seasonMonth: seasonMonth,
+export async function storeClanWarLeagueGroup_clashyStats(seasonId: number) {
+  return await prisma.clanWarLeagueGroup.create({
+    data: {
+      seasonId: seasonId,
     },
   });
+}
+export async function getClanWarLeagueGroup_clashyStats(seasonId: number, month: number) {}
 
-  return group;
+export async function storeClanWarLeagueGroupClan_ClashyStats(groupId: number, clans: { tag: string; name: string }[]) {
+  try {
+    return await prisma.clanWarLeagueGroupClan.createMany({
+      data: clans.map((clan) => ({
+        groupId: groupId,
+        clanTag: clan.tag,
+      })),
+    });
+  } catch (error) {
+    console.log("Error while adding groupClans:", error);
+    return;
+  }
 }
 
-export async function storeClanWarLeagueGroupClan_clashyStats(clanTag: string, groupId: number) {
+export async function storeClanWarLeagueRound_ClashyStats(groupID: number, roundNumber: number) {
+  return await prisma.clanWarLeagueRound.create({
+    data: {
+      groupId: groupID,
+      roundNumber: roundNumber,
+    },
+  });
+}
+
+export async function storeClanWarLeagueMatch_ClashyStats(roundID: number, match: ClanWarLeagueMatch_clashyClash) {
   try {
-    const newClanWarLeagueGroupClan = await prisma.clanWarLeagueGroupClan.create({
+    return await prisma.clanWarLeagueMatch.create({
       data: {
-        clanTag: clanTag,
-        groupId: groupId,
+        roundId: roundID,
+        clanOneTag: match.clanOneData.tag,
+        clanTwoTag: match.clanTwoData.tag,
+        clanOneStats: match.clanOneStats,
+        clanTwoStats: match.clanTwoStats,
+        winner: match.winner,
       },
     });
-    console.log("New ClanWarLeagueGroupClan added:", newClanWarLeagueGroupClan);
-    return newClanWarLeagueGroupClan;
   } catch (error) {
-    console.error("Error adding ClanWarLeagueGroupClan:", error);
+    console.error("Fel vid lägg till match:", error);
+    throw error;
+  }
+}
+export async function getClanWarLeagueMatch_ClashyStats(
+  attackerTag: string,
+  defenderTag: string,
+  seasonYear: number,
+  seasonMonth: number
+) {}
+
+export async function storeClanWarLeagueAttack_ClashyStats(attack: ClanWarLeagueAttack_clashyClash) {
+  try {
+    return await prisma.clanWarLeagueAttack.create({
+      data: {
+        matchId: attack.matchId,
+        attackerPlayerTag: attack.attackerPlayerTag,
+        defenderPlayerTag: attack.defenderPlayerTag,
+        stars: attack.stars,
+        destructionPercentage: attack.destructionPercentage,
+        duration: attack.duration,
+        gotAttacked: attack.gotAttacked,
+      },
+    });
+  } catch (error) {
+    console.error("Fel vid lägg till attack:", error);
     throw error;
   }
 }
 
-export async function getClanWarLeagueGroupClan_clashyStats(clanTag: string) {
-  try {
-    const groupClan = await prisma.clanWarLeagueGroupClan.findFirst({
-      where: {
-        clanTag: clanTag,
-      },
-      include: {
-        group: true, // Inkludera den relaterade gruppen
-      },
-    });
-
-    return groupClan ? groupClan.group : null; // Returnera gruppen om den finns, annars null
-  } catch (error) {
-    console.error("Error while finding group with clan:", error);
-    return null; // Returnera null vid fel
-  }
-}
-
-export async function storeClanWarLeagueMatch_clashyStats(
-  match: CwlMatchObject
-): Promise<ClanWarLeagueMatch_clashyClash> {
-  const { round, clanOneTag, clanTwoTag, clanOneStats, clanTwoStats, groupId, winner } = match;
-
-  return await prisma.clanWarLeagueMatch.create({
-    data: {
-      groupId: groupId,
-      round: round,
-      clanOneTag: clanOneTag,
-      clanTwoTag: clanTwoTag,
-      clanOneStats: clanOneStats as unknown as Prisma.JsonObject,
-      clanTwoStats: clanTwoStats as unknown as Prisma.JsonObject,
-      winner: winner,
-    },
-  });
-}
-
-export async function getClanWarLeagueMatch_clashyStats(
-  seasonYear: number,
-  seasonMonth: number,
-  clanOneTag: string,
-  clanTwoTag: string
-): Promise<ClanWarLeagueMatch_clashyClash | null> {
-  // Hämta grupp-ID baserat på seasonYear och seasonMonth
-  const group = await prisma.clanWarLeagueGroup.findFirst({
+export async function getClanWarLeagueWar(clanTag: string, seasonYear: number, seasonMonth: number) {
+  return await prisma.clanWarLeagueSeason.findFirst({
     where: {
-      seasonYear: seasonYear,
-      seasonMonth: seasonMonth,
+      seasonYear,
+      seasonMonth,
+      ClanWarLeagueGroup: {
+        some: {
+          groupClans: {
+            some: {
+              clanTag,
+            },
+          },
+        },
+      },
     },
-    select: {
-      id: true,
-    },
-  });
-
-  if (!group) {
-    throw new Error("Group not found");
-  }
-
-  // Hämta matchen baserat på grupp-ID, clanOneTag och clanTwoTag
-  const match = await prisma.clanWarLeagueMatch.findFirst({
-    where: {
-      groupId: group.id,
-      clanOneTag: clanOneTag,
-      clanTwoTag: clanTwoTag,
-    },
-  });
-
-  return match;
-}
-
-export async function storeClanWarLeagueAttacks_clashyStats(attacks: ClanWarLeagueAttack_clashyClash) {
-  return await prisma.clanWarLeagueAttack.create({
-    data: {
-      matchId: attacks.matchId,
-      attackerPlayerTag: attacks.attackerPlayerTag,
-      defenderPlayerTag: attacks.defenderPlayerTag,
-      stars: attacks.stars,
-      destructionPercentage: attacks.destructionPercentage,
-      duration: attacks.duration,
-      gotAttacked: attacks.gotAttacked,
+    include: {
+      ClanWarLeagueGroup: {
+        include: {
+          groupClans: {
+            include: {
+              clan: true,
+            },
+          },
+          rounds: {
+            include: {
+              matches: {
+                include: {
+                  clanOne: true,
+                  clanTwo: true,
+                },
+              },
+            },
+          },
+        },
+      },
     },
   });
 }

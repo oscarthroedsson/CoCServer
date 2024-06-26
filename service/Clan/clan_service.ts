@@ -6,6 +6,16 @@ import {
 } from "../../types/ClashyStats/clanMemberRecord.types";
 import { Clan_clashyStats } from "../../types/ClashyStats/clan.types";
 import { LatestClanMembers } from "../../types/ClashyStats/latestClanMembers.types";
+import { addNewClanProps } from "../../types/Register/Register.types";
+
+export function storeClan_ClashyStats(newClan: addNewClanProps) {
+  return prisma.clan.create({
+    data: {
+      clanTag: newClan.tag,
+      clanName: newClan.name,
+    },
+  });
+}
 
 export async function getAllClans_clashyStats(): Promise<{ clanTag: string; clanName: string }[]> {
   try {

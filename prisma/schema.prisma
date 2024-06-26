@@ -49,6 +49,7 @@ model Clan {
   clanWarAsClanOne          ClanWarMatch[]              @relation("clanOne")
   clanWarAsClanTwo          ClanWarMatch[]              @relation("clanTwo")
   capitalRaids              CapitalRaids[]
+  ClanWarLeagueResult       ClanWarLeagueResult[]
 }
 
 // ---------------------------------------- 📜 COLLECT HISTORY TABLES --------------------------------------------------
@@ -99,28 +100,48 @@ model ClanCapitalContributionsHistory {
 }
 
 // ---------------------------------------- 🪖⚔️ CLAN WAR LEAGUE TABLES --------------------------------------------------
+
+model ClanWarLeagueSeason {
+  id                 Int                  @id @default(autoincrement())
+  seasonYear         Int
+  seasonMonth        Int
+  ClanWarLeagueGroup ClanWarLeagueGroup[]
+
+  @@unique([seasonYear, seasonMonth])
+}
+
 model ClanWarLeagueGroup {
-  id          Int                      @id @default(autoincrement())
-  seasonYear  Int
-  seasonMonth Int
-  groupClans  ClanWarLeagueGroupClan[]
-  matches     ClanWarLeagueMatch[]
+  id                  Int                      @id @default(autoincrement())
+  seasonId            Int
+  season              ClanWarLeagueSeason      @relation(fields: [seasonId], references: [id])
+  groupClans          ClanWarLeagueGroupClan[]
+  rounds              ClanWarLeagueRound[]
+  ClanWarLeagueResult ClanWarLeagueResult[]
 }
 
 model ClanWarLeagueGroupClan {
   id      Int                @id @default(autoincrement())
   clanTag String
-  group   ClanWarLeagueGroup @relation(fields: [groupId], references: [id])
   groupId Int
+  group   ClanWarLeagueGroup @relation(fields: [groupId], references: [id])
   clan    Clan               @relation(fields: [clanTag], references: [clanTag])
 
   @@unique([clanTag, groupId])
 }
 
+model ClanWarLeagueRound {
+  id          Int                  @id @default(autoincrement())
+  groupId     Int
+  roundNumber Int
+  group       ClanWarLeagueGroup   @relation(fields: [groupId], references: [id])
+  matches     ClanWarLeagueMatch[]
+
+  @@unique([groupId, roundNumber])
+}
+
 model ClanWarLeagueMatch {
   id           Int                   @id @default(autoincrement())
-  groupId      Int
-  round        Int
+  roundId      Int
   clanOneTag   String
   clanTwoTag   String
   clanOneStats Json
@@ -128,10 +149,8 @@ model ClanWarLeagueMatch {
   winner       String
   clanOne      Clan                  @relation("clanOne", fields: [clanOneTag], references: [clanTag])
   clanTwo      Clan                  @relation("clanTwo", fields: [clanTwoTag], references: [clanTag])
-  group        ClanWarLeagueGroup    @relation(fields: [groupId], references: [id])
+  round        ClanWarLeagueRound    @relation(fields: [roundId], references: [id])
   attacks      ClanWarLeagueAttack[]
-
-  // Kan lägga till detta:   @@unique([groupId, round, clanOneTag, clanTwoTag, endTime]) för att förhindra dubbletter
 }
 
 model ClanWarLeagueAttack {
@@ -146,6 +165,21 @@ model ClanWarLeagueAttack {
   attacker              User               @relation("attacker", fields: [attackerPlayerTag], references: [gameTag])
   defender              User?              @relation("defender", fields: [defenderPlayerTag], references: [gameTag])
   match                 ClanWarLeagueMatch @relation(fields: [matchId], references: [id])
+}
+
+model ClanWarLeagueResult {
+  id                    Int                @id @default(autoincrement())
+  groupId               Int
+  clanTag               String
+  placement             Int
+  wins                  Int
+  draws                 Int
+  losses                Int
+  stars                 Int
+  attacks               Int
+  destructionPercentage Float
+  group                 ClanWarLeagueGroup @relation(fields: [groupId], references: [id])
+  clan                  Clan               @relation(fields: [clanTag], references: [clanTag])
 }
 
 // ---------------------------------------- 🪖 CLAN WAR TABLES --------------------------------------------------

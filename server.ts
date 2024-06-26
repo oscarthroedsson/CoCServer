@@ -4,8 +4,8 @@ import morgan from "morgan";
 import routes from "./routes";
 import dotenv from "dotenv";
 import { scheduleJobs } from "./Jobs/scheduleJobs";
-import { job_collectClanCapitalData } from "./Jobs/clanCapital/collectClanCapitalData";
-import { onBoarding_ClanCapital } from "./middlewares/Onboarding/clanCapital_Onboarding";
+
+import { collectClanWarLeagueHistory } from "./middlewares/ClanWarLeague/collectClanWarLeagueHistory";
 
 // import "./Queues/index";
 
@@ -19,8 +19,8 @@ app.use(morgan("dev"));
 app.use(routes);
 
 // scheduleJobs();
-// job_collectClanCapitalData();
-// onBoarding_ClanCapital("#2QJ2QG29R");
+
+collectClanWarLeagueHistory("#2QJ2QG29R");
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

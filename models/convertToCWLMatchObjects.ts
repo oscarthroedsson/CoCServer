@@ -1,6 +1,10 @@
 import { ClanWarLeagueMatch_clashyClash } from "../types/ClashyStats/clanWarLeague.types";
-import { ClanWarLeagueMatchClanObject_Supercell } from "../types/Supercell/clanWarLeague.types";
+import {
+  CWLMatchObjectMemberList_Supercell,
+  ClanWarLeagueMatchClanObject_Supercell,
+} from "../types/Supercell/clanWarLeague.types";
 import { findMatchWinner } from "../utils/helpers/foundMatchWinner";
+import { convertToAttackObject } from "./convertToAttackObject";
 
 /**
  * @param id - from groupObject
@@ -15,19 +19,27 @@ export function convertToCWLMatchObject(
   clanTwo: ClanWarLeagueMatchClanObject_Supercell
 ): ClanWarLeagueMatch_clashyClash {
   return {
-    groupId: id,
-    round: round,
-    clanOneTag: clanOne.tag,
-    clanTwoTag: clanTwo.tag,
+    roundId: round,
+    round: id,
+    clanOneData: { tag: clanOne.tag, name: clanOne.name },
+    clanTwoData: { tag: clanTwo.tag, name: clanTwo.name },
     clanOneStats: {
-      attacks: clanOne.attacks,
+      numOfAttacks: clanOne.attacks,
       stars: clanOne.stars,
       destructionPercentage: clanOne.destructionPercentage,
+      //@ts-ignore
+      attacks: clanOne.members.flatMap((member: CWLMatchObjectMemberList_Supercell) => {
+        return convertToAttackObject(member);
+      }),
     },
     clanTwoStats: {
-      attacks: clanTwo.attacks,
-      stars: clanTwo.stars,
-      destructionPercentage: clanTwo.destructionPercentage,
+      numOfAttacks: clanOne.attacks,
+      stars: clanOne.stars,
+      destructionPercentage: clanOne.destructionPercentage,
+      //@ts-ignore
+      attacks: clanTwo.members.flatMap((member: CWLMatchObjectMemberList_Supercell) => {
+        return convertToAttackObject(member);
+      }),
     },
     winner:
       findMatchWinner(
