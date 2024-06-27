@@ -35,6 +35,7 @@ export async function job_leavesAndJoinsClan() {
     }
 
     const currentMembersList = await getClan_superCell(clanTag.clanTag);
+    if (!currentMembersList) continue;
 
     /*
     If current member cant´t be found, it means that the member has left the clan

@@ -5,6 +5,7 @@ export interface WarLogData {
 export interface WarLog_ClanWarHistory {
   result: string;
   endTime: string;
+  startTime: string;
   teamSize: number;
   attacksPerMember: number;
   battleModifier: string;
@@ -16,13 +17,13 @@ export interface WarLog_ClanWarHistory {
     attacks: number;
     stars: number;
     destructionPercentage: number;
-    expEarned: number;
   };
   opponent: {
     tag: string;
     name: string;
     badgeUrls: { small: string; large: string; medium: string };
     clanLevel: number;
+    attacks: number;
     stars: number;
     destructionPercentage: number;
   };

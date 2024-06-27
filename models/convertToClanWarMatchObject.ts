@@ -25,7 +25,6 @@ export function convertToClanWarMatchObject(clanWarData: Supercell_CurrrentClanW
         clanWarData.clan.members
       ),
       destructionPercentage: clanWarData.clan.destructionPercentage,
-      expEarned: clanWarData.clan.expEarned,
     },
     clanTwoStats: {
       stars: clanWarData.opponent.stars,
@@ -36,7 +35,6 @@ export function convertToClanWarMatchObject(clanWarData: Supercell_CurrrentClanW
         clanWarData.opponent.members
       ),
       destructionPercentage: clanWarData.opponent.destructionPercentage,
-      expEarned: clanWarData.clan.expEarned,
     },
     teamSize: clanWarData.teamSize,
     winner: findMatchWinner(clanWarData.clan, clanWarData.opponent) ?? "",

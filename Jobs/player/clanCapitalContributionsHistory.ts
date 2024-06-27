@@ -1,9 +1,9 @@
-import { getPlayer_superCell } from "../../../API/Player/player_Api";
-import { getAllPlayers_clashyStats } from "../../../service/Player/player_service";
+import { getPlayer_superCell } from "../../API/Player/player_Api";
+import { getAllPlayers_clashyStats } from "../../service/Player/player_service";
 import {
   addClanCapitalContributions_clashyStats,
   getLatestClanCapitalContributions_clashyStats,
-} from "../../../service/jobs_service/clanCapitalContributions_service";
+} from "../../service/jobs_service/clanCapitalContributions_service";
 
 export async function job_clanCapitalContributionsHistory() {
   const playersTag = await getAllPlayers_clashyStats();

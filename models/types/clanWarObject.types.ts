@@ -10,15 +10,15 @@ export interface Supercell_CurrrentClanWarData {
 
 export interface ClanWarMatchObject {
   id?: number;
+  clanOneTag: string;
+  clanTwoTag: string;
+  teamSize: number;
   seasonYear: number;
   seasonMonth: number;
   startTime: Date;
   endTime: Date;
-  clanOneTag: string;
-  clanTwoTag: string;
   clanOneStats: ClanWarClanStats;
   clanTwoStats: ClanWarClanStats;
-  teamSize: number;
   winner: string;
   attacks?: any[];
 }
@@ -28,7 +28,6 @@ export interface ClanWarClanStats {
   attacks: number;
   attackPercentage: number;
   destructionPercentage: number;
-  expEarned: number;
 }
 
 export interface ClanWarMatchObjectMemberList {

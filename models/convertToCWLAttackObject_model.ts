@@ -11,10 +11,10 @@ export function convertToCWLAttackObject_model(
         matchId: matchID,
         attackerPlayerTag: member.tag,
         defenderPlayerTag: null,
+        attack: 0,
         stars: 0,
         destructionPercentage: 0,
         duration: 0,
-
         gotAttacked: member.opponentAttacks > 0 ? true : false,
       },
     ];
@@ -23,6 +23,7 @@ export function convertToCWLAttackObject_model(
   return member.attacks.map((attack) => {
     return {
       matchId: matchID,
+      attack: 0,
       attackerPlayerTag: member.tag,
       defenderPlayerTag: attack.defenderTag,
       stars: attack.stars,

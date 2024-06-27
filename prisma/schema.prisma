@@ -19,9 +19,6 @@ model User {
   gameTag                  String                            @unique
   gameName                 String
   clanTag                  String? // clanTag can be either a String or null
-  totalDonations           Int?                              @default(0) // totalDonations can be either an Int or null
-  totalDonationsReceived   Int?                              @default(0) // totalDonationsReceived can be either an Int or null
-  donationRatio            Int?                              @default(0) // donationRatio can be either an Int or null
   email                    String?                           @unique
   createdAt                DateTime                          @default(now())
   updatedAt                DateTime                          @updatedAt

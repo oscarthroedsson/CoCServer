@@ -1,6 +1,6 @@
 import { isClanAtWar_superCell } from "../../../API/War/war_Api";
 import { addJobb_collectClanWarData } from "../../../Queues";
-import { onBoardClanAndMembers } from "../../../middlewares/Onboarding/clan_Onboarding";
+import { onBoard_ClanAndMembers } from "../../../middlewares/Onboarding/clan_Onboarding";
 import { getAllClans_clashyStats } from "../../../service/Clan/clan_service";
 import { convertToCorrectDateObject } from "../../../utils/helpers/converToCorrectDateObj";
 import { doesClanExist_clashyStats } from "../../../validation/Clan/doesClanExist";
@@ -26,7 +26,7 @@ export async function checkIfClanIsAtWar() {
       const clanExist = await doesClanExist_clashyStats(clan.tag);
       if (!clanExist) {
         console.log("🚢 Onboarding Clan And Members");
-        onBoardClanAndMembers({ tag: clan.tag, name: clan.name, members: clan.members });
+        onBoard_ClanAndMembers(clan.tag);
       }
 
       // add job to queue

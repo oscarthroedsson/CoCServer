@@ -171,7 +171,7 @@ export async function onBoard_ClanAndMembers(clan: string) {
   await onBoard_ClanMembers(clan);
   // await onBoard_ClanMemberRegister(clan); // ✅ Tested n it works
   // await onBoarding_ClanCapital(clan); // ✅ Tested n it works
-  // await onBoard_clanWarLogHistory(clan); // ✅ clanWar works n
-  await onBoard_ClanWarLeaguesHistory(clan);
+  // await onBoard_clanWarLogHistory(clan); // ✅ clanWar works
+  await onBoard_ClanWarLeaguesHistory(clan); // ✅ CWL history works
   console.log("🚚 ✅ Onboarding Done ");
 }

@@ -1,10 +1,9 @@
 import prisma from "../../prisma";
 
-export async function doesClanWarLeagueGroupExist_clashyStats(year: number, month: number) {
+export async function doesClanWarLeagueGroupExist_clashyStats(seasonId: number) {
   const response = await prisma.clanWarLeagueGroup.findFirst({
     where: {
-      seasonYear: year,
-      seasonMonth: month,
+      seasonId: seasonId,
     },
   });
 
@@ -29,16 +28,9 @@ export async function doesClanWarLeagueGroupClanExist_clashyStats(clanTag: strin
   }
 }
 
-export async function doesClanWarLeagueMatchExist_clashyStats(uniqueKeys: {
-  groupId: number;
-  round: number;
-  clanOneTag: string;
-  clanTwoTag: string;
-}) {
+export async function doesClanWarLeagueMatchExist_clashyStats(uniqueKeys: { clanOneTag: string; clanTwoTag: string }) {
   const match = await prisma.clanWarLeagueMatch.findFirst({
     where: {
-      groupId: uniqueKeys.groupId,
-      round: uniqueKeys.round,
       clanOneTag: uniqueKeys.clanOneTag,
       clanTwoTag: uniqueKeys.clanTwoTag,
     },

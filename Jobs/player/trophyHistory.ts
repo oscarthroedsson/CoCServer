@@ -1,9 +1,9 @@
-import { getPlayer_superCell } from "../../../API/Player/player_Api";
-import { getAllPlayers_clashyStats } from "../../../service/Player/player_service";
+import { getPlayer_superCell } from "../../API/Player/player_Api";
+import { getAllPlayers_clashyStats } from "../../service/Player/player_service";
 import {
   addTrophyHistory_clashyStats,
   getLatestTrophyHistory_clashyStats,
-} from "../../../service/jobs_service/trophyHistory_service";
+} from "../../service/jobs_service/trophyHistory_service";
 
 export async function job_CollectrophyHistory(): Promise<void> {
   let number = 0;

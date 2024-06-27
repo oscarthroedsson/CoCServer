@@ -6,11 +6,11 @@ import prisma from "../../prisma";
  * @param clanTag
  * @returns
  */
-export async function doesCWLMatchExist_clashyStats(groupID: number, clanTag: string) {
+export async function doesCWLMatchExist_clashyStats(roundId: number, clanTag: string) {
   const convertedClanTag = changeToURLencoding(clanTag);
   const response = await prisma.clanWarLeagueMatch.findFirst({
     where: {
-      groupId: groupID,
+      roundId: roundId,
       clanOneTag: convertedClanTag,
     },
   });

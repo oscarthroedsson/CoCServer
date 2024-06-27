@@ -1,13 +1,12 @@
-import { getPlayer_superCell } from "../../../API/Player/player_Api";
-import { getAllPlayers_clashyStats } from "../../../service/Player/player_service";
+import { getPlayer_superCell } from "../../API/Player/player_Api";
+import { getAllPlayers_clashyStats } from "../../service/Player/player_service";
 import {
   addDonationHistory_clashyStats,
   getLatestDonationHistory_clashyStats,
-} from "../../../service/jobs_service/donationHistory_service";
-
-import { donationPerson } from "../../../utils/constants/donationType";
-import { calculateRatio } from "../../../utils/helpers/ratioCalculation";
-import { notTheSameMonth } from "../../../validation/jobs/notTheSameMonth";
+} from "../../service/jobs_service/donationHistory_service";
+import { donationPerson } from "../../utils/constants/donationType";
+import { calculateRatio } from "../../utils/helpers/ratioCalculation";
+import { notTheSameMonth } from "../../validation/jobs/notTheSameMonth";
 
 export async function job_CollectDonationHistory(): Promise<void> {
   console.log("schedule| Running job_CollectDonationHistory()");

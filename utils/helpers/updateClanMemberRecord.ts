@@ -12,6 +12,7 @@ export async function generateClanMemberRecord(): Promise<void> {
   for (const clanTag of clanTags) {
     const members: ClanMemberRecordObject[] = [];
     const clanMembers = await getClan_superCell(clanTag.clanTag); // get clan data
+    if (!clanMembers) continue;
 
     // loop threw all clan members and add them to the members array
     clanMembers.memberList.forEach((member: MemberListObject_Supercell) => {
