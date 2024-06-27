@@ -23,7 +23,6 @@ export async function onBoarding_ClanCapital(clanTag: string) {
     return raid.state !== "ongoing" && raid.state !== "preparing";
   });
 
-  //   console.log("🏳️‍🌈 raidHistory", raidHistory, "length: ", raidHistory.length);
   let count = 0;
   for (const raid of raidHistory) {
     count++;
@@ -79,9 +78,7 @@ export async function onBoarding_ClanCapital(clanTag: string) {
             enemyDistrictsDestroyed: attackRaid.districtsDestroyed,
           }
         );
-        //    console.log("STOP 👮🏼‍♂️🚔");
-        //    if (raidHistory.length < 1) return;
-        //    if (raidHistory.length > 1) return;
+
         if (!clanCapitalRaidResponse?.id) break; //🚨 abort if somehting goes wrong with storing in DB- we can´t continue without the ID
 
         for (const districts of attackRaid.districts) {

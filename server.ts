@@ -20,7 +20,7 @@ app.use(routes);
 
 // scheduleJobs();
 
-collectClanWarLeagueHistory("#2QJ2QG29R");
+// collectClanWarLeagueHistory("#2QJ2QG29R");
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
