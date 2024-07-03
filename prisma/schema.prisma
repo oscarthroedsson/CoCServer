@@ -35,7 +35,7 @@ model User {
 model Clan {
   id                        Int                         @id @default(autoincrement()) @db.UnsignedInt
   clanTag                   String                      @unique
-  clanName                  String                      @unique
+  clanName                  String
   createdAt                 DateTime                    @default(now())
   updatedAt                 DateTime                    @updatedAt
   ClanMembers               LatestClanMembers?
@@ -153,6 +153,7 @@ model ClanWarLeagueMatch {
 model ClanWarLeagueAttack {
   id                    Int                @id @default(autoincrement())
   matchId               Int
+  attack                Int
   attackerPlayerTag     String
   defenderPlayerTag     String?
   stars                 Int
@@ -162,6 +163,8 @@ model ClanWarLeagueAttack {
   attacker              User               @relation("attacker", fields: [attackerPlayerTag], references: [gameTag])
   defender              User?              @relation("defender", fields: [defenderPlayerTag], references: [gameTag])
   match                 ClanWarLeagueMatch @relation(fields: [matchId], references: [id])
+
+  @@unique([matchId, attack, attackerPlayerTag, defenderPlayerTag])
 }
 
 model ClanWarLeagueResult {

@@ -90,26 +90,36 @@ export async function onBoard_ClanMembers(clanTag: string) {
     console.error("🚨 onBoard_ClanMembers | ❗❗ Clan data not found", clanTag);
     return;
   }
+  if (!clan.memberList) return console.error("❗❗ Clan memberList not found", clanTag);
 
   const members = clan.memberList;
 
   for (const member of members) {
+    if (!member.tag) continue;
     const playerExist = await doesPlayerExist_clashyStats(member.tag);
 
     if (!playerExist) {
       console.log("🚨 Do not Exist", playerExist, " | ", member.tag, " | ", member.name);
       const playerData = await getPlayer_superCell(member.tag);
 
-      if (!playerData) {
-        console.error("❗❗ Player data not found", member.tag);
-        continue;
-      }
+      // if (!playerData) {
+      //   await registerPlayer_clashyStats({
+      //     gameTag: member.tag,
+      //     email: null,
+      //     clanTag: clan.tag,
+      //     gameName: member.name,
+      //     acceptTerms: false,
+      //   });
+      //   console.error("❗❗ Player data not found", member.tag);
+      //   continue;
+      // }
 
+      if (!playerData.tag || !playerData.clan.tag || !playerData.name) continue;
       await registerPlayer_clashyStats({
-        gameTag: playerData.tag,
+        gameTag: playerData ? playerData.tag : member.tag,
         email: null,
-        clanTag: playerData.clan.tag,
-        gameName: playerData.name,
+        clanTag: playerData ? playerData.clan.tag : clan.tag,
+        gameName: playerData ? playerData.name : member.name,
         acceptTerms: false,
       });
       console.log("🌼 Member added", playerData.name, " | ", playerData.tag);
@@ -150,15 +160,21 @@ export async function onBoard_ClanWarLeaguesHistory(clanTag: string) {
 //--------------------------- 👥 ONBOARDING GROUPS 👥 ---------------------------
 /* This functions onboard multiple stuffs */
 export async function onBoard_clanWarLogHistory(clanTag: string) {
-  const warHistory = await getClanWarHistory_ClashKing(clanTag);
-  if (!warHistory) return;
+  console.log("🚂 Collect clan war history");
+  try {
+    const warHistory = await getClanWarHistory_ClashKing(clanTag);
+    console.log("WARHISTORY: ", warHistory);
+    if (!warHistory) return;
 
-  const clanWars = warHistory.filter((war: ClanWarObject_Supercell) => war.hasOwnProperty("attacksPerMember"));
+    const clanWars = warHistory.filter((war: ClanWarObject_Supercell) => war.hasOwnProperty("attacksPerMember"));
 
-  for (const war of clanWars) {
-    await onBoard_ClanWarHistory(war);
+    for (const war of clanWars) {
+      await onBoard_ClanWarHistory(war);
+    }
+    console.log("🧙🏼 War History added");
+  } catch (e) {
+    console.log("🚨🚨🚨 Error in onBoard_clanWarLogHistory", e);
   }
-  console.log("🧙🏼 War History added");
 }
 
 /**

@@ -5,13 +5,17 @@ import { getAllClans_clashyStats } from "../../../service/Clan/clan_service";
 import { convertToCorrectDateObject } from "../../../utils/helpers/converToCorrectDateObj";
 import { doesClanExist_clashyStats } from "../../../validation/Clan/doesClanExist";
 
+/**
+ *
+ *  @description Checks if a clan is at war - if it is, we check end time and add a job to the queue that runs 5min before the war ends
+ * @implements {addJobb_collectClanWarData} - Adds a job to the queue to collect clan war data
+ */
 export async function checkIfClanIsAtWar() {
   let count = 0;
   const tags = await getAllClans_clashyStats();
-  console.log("num of clans: ", tags.length);
   if (tags.length === 0) return;
+
   for (const tag of tags) {
-    console.log("checking:", count);
     count++;
 
     const clanWarData = await isClanAtWar_superCell(tag.clanTag);
@@ -25,7 +29,6 @@ export async function checkIfClanIsAtWar() {
       // check if we have both clans in DB, if not, add them and onboard members
       const clanExist = await doesClanExist_clashyStats(clan.tag);
       if (!clanExist) {
-        console.log("🚢 Onboarding Clan And Members");
         onBoard_ClanAndMembers(clan.tag);
       }
 

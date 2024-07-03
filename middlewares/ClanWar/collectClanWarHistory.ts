@@ -14,9 +14,9 @@ import { convertToClanWarAttackObject } from "../../models/convertToClanWarAttac
 import { convertToCorrectDateObject } from "../../utils/helpers/converToCorrectDateObj";
 import { ClanWarMemberObject_Supercell, ClanWarObject_Supercell } from "../../types/Supercell/clanWar.types";
 import { doesClanExist_clashyStats } from "../../validation/Clan/doesClanExist";
-import { onBoard_Clan, onBoard_ClanAndMembers, onBoard_ClanMembers } from "../Onboarding/clan_Onboarding";
+import { onBoard_Clan } from "../Onboarding/clan_Onboarding";
 import { doesPlayerExist_clashyStats } from "../../validation/Player/doesPlayerExist";
-import { registerPlayer_clashyStats } from "../../service/Register/registerPlayer_service";
+
 import { onBoard_Player } from "../Onboarding/player_Onboarding";
 import { doesClanWarAttackExist_clashyStats } from "../../validation/war/doesClanWarAttackExist";
 
@@ -34,6 +34,7 @@ import { doesClanWarAttackExist_clashyStats } from "../../validation/war/doesCla
  * @param clanTag - The tag of the clan to collect war history for.
  */
 export async function collectClanWarHistory(clanWarObject: ClanWarObject_Supercell) {
+  console.log("🚂 Collect clan war history");
   const startTime: Date = convertToCorrectDateObject(clanWarObject.startTime).fulldate;
   const endTime: Date = convertToCorrectDateObject(clanWarObject.endTime).fulldate;
 
@@ -41,40 +42,63 @@ export async function collectClanWarHistory(clanWarObject: ClanWarObject_Superce
   const opponentExist = await doesClanExist_clashyStats(clanWarObject.opponent.tag);
   if (!opponentExist) {
     try {
+      console.log("🏁 Onboarding a clan: ", clanWarObject.clan.tag, clanWarObject.clan.name);
       await onBoard_Clan(clanWarObject.opponent.tag);
     } catch (e) {
-      console.error("🚨🚨🚨", e);
+      console.error("🚨🚨🚨 collectClanWarHistory", e);
       return;
     }
   }
   const clanExists = await doesClanExist_clashyStats(clanWarObject.clan.tag);
   if (!clanExists) {
     try {
+      console.log("🏁 Onboarding a clan: ", clanWarObject.clan.tag, clanWarObject.clan.name);
       await onBoard_Clan(clanWarObject.clan.tag);
     } catch (e) {
-      console.error("🚨🚨🚨", e);
+      console.error("🚨🚨🚨 collectClanWarHistory", e);
       return;
     }
 
     // 📚 Validating if clan andopponents member exist
     for (const member of clanWarObject.clan.members) {
+      if (!member.tag) {
+        console.error("🚨🚨🚨 collectClanWarHistory", member.tag);
+      }
       const playerExist = await doesPlayerExist_clashyStats(member.tag);
 
       if (!playerExist) {
         try {
-          await onBoard_Player(member.tag);
+          await onBoard_Player({
+            gameName: member.name,
+            gameTag: member.tag,
+            clanTag: clanWarObject.clan.tag,
+            email: null,
+            acceptTerms: false,
+          });
         } catch (e) {
           return;
         }
       }
     }
   }
+
   for (const opponentMember of clanWarObject.opponent.members) {
+    if (!opponentMember.tag) {
+      console.error("🚨🚨🚨 collectClanWarHistory", opponentMember.tag);
+      continue;
+    }
+
     const playerExist = await doesPlayerExist_clashyStats(opponentMember.tag);
 
     if (!playerExist) {
       try {
-        await onBoard_Player(opponentMember.tag);
+        await onBoard_Player({
+          gameTag: opponentMember.tag,
+          gameName: opponentMember.name,
+          clanTag: clanWarObject.opponent.tag,
+          email: null,
+          acceptTerms: false,
+        });
       } catch (e) {
         return;
       }

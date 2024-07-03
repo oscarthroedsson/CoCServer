@@ -1,17 +1,15 @@
 import { getPlayer_superCell } from "../../API/Player/player_Api";
 import { storePlayer_clashyStats } from "../../service/Player/player_service";
+import { PlayerProps_clashyStats } from "../../types/ClashyStats/player.types";
 
-export async function onBoard_Player(playerTag: string) {
-  const playerData = await getPlayer_superCell(playerTag);
-  if (!playerData) {
-    console.error("❗❗ Player data not found", playerTag);
-    return;
-  }
+export async function onBoard_Player(playerTag: PlayerProps_clashyStats) {
+  if (!playerTag || !playerTag.gameTag || !playerTag.gameName)
+    return console.error("❗❗ Player data not found", playerTag);
 
   await storePlayer_clashyStats({
-    gameTag: playerData.tag,
-    gameName: playerData.name,
-    clanTag: playerData.clan ? playerData.clan.tag : null,
+    gameTag: playerTag.gameTag,
+    gameName: playerTag.gameName,
+    clanTag: playerTag.clanTag,
     email: null,
     acceptTerms: false,
   });

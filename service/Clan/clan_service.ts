@@ -9,6 +9,7 @@ import { LatestClanMembers } from "../../types/ClashyStats/latestClanMembers.typ
 import { addNewClanProps } from "../../types/Register/Register.types";
 
 export function storeClan_ClashyStats(newClan: addNewClanProps) {
+  console.log("🗽 newClan: ", newClan);
   return prisma.clan.create({
     data: {
       clanTag: newClan.tag,

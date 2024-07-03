@@ -28,6 +28,9 @@ client.on("connect", () => {
 const collectClanWarData = new Queue("collectClanWarInfo", {
   connection: redisConnection,
 });
+const collectClanWarLeagueData = new Queue("collectClanWarLeagueInfo", {
+  connection: redisConnection,
+});
 
 /**
  Creates a new worker instance. The name of the worker and the logic is the most important. Create it, write the logic then leave it alone. 
@@ -42,6 +45,15 @@ new Worker(
   { connection: redisConnection, concurrency: 50 }
 );
 
+new Worker(
+  "collectClanWarLeagueInfo",
+  async (job) => {
+    console.log("🏁 Worker was run", job.data.clanTag);
+    // collectClanWarLeague(job.data.clanTag);
+  },
+  { connection: redisConnection, concurrency: 50 }
+);
+
 /**
  * @description This function adds a job to the queue to collect clan war data.
  * @param delay number, clanTag string
@@ -49,13 +61,36 @@ new Worker(
  */
 
 export async function addJobb_collectClanWarData(endTime: Date, clanTag: string) {
-  if (!redisConnection) console.log("🚨 something wrong with redisConnection");
+  if (!redisConnection) return;
+  /*
+  📚 Looking which today is, and calculate how many ms it is left to 5min before the war ends and set that as a delay.
+  Then scheduale the job to run at that time.
+  */
   const currentTime = new Date();
   const timeToScheduleJob = new Date(endTime.getTime() - 5 * 60 * 1000); // 5min before war ends
   const delayInMs = timeToScheduleJob.getTime() - currentTime.getTime();
+  const jobExist = await doesJobExistsForCollectClanWarData("collectClanWarInfo", clanTag);
+  if (jobExist) return;
 
   await collectClanWarData.add(
     "collectClanWarInfo",
+    { clanTag },
+    { removeOnComplete: true, removeOnFail: true, delay: delayInMs }
+  );
+}
+
+//! needs to implement this logic
+export async function addJob_collectClanWarLeagueData(endTime: Date, clanTag: string) {
+  console.log("💼 Wanted to add job");
+  const currentTime = new Date();
+  const timeToScheduleJob = new Date(endTime.getTime() - 5 * 60 * 1000); // 5min before war ends
+  const delayInMs = timeToScheduleJob.getTime() - currentTime.getTime();
+  const jobExist = await doesJobExistsForCollectClanWarLeagueData("collectClanWarLeagueInfo", clanTag);
+
+  console.log("data: ", { currentTime, timeToScheduleJob, delayInMs, clanTag, jobExist });
+
+  await collectClanWarLeagueData.add(
+    "collectClanWarLeagueInfo",
     { clanTag },
     { removeOnComplete: true, removeOnFail: true, delay: delayInMs }
   );
@@ -66,43 +101,36 @@ export async function addJobb_collectClanWarData(endTime: Date, clanTag: string)
  * @param jobName string collectClanWarInfo | monkey | banana
  * @param clanTag string
  */
-export async function doesJobExistsForCollectClanWarData(jobName: string = "collectClanWarInfo", clanTag: string) {
+export async function doesJobExistsForCollectClanWarData(jobName: string, clanTag: string) {
   const jobs = await collectClanWarData.getJobs(["waiting"]);
+  if (!jobName) throw new Error("🚨 jobName is missing");
 
   const specificJobExists = jobs.some((job) => job.name === jobName && job.data.clanTag === clanTag);
-  return specificJobExists;
+  return !!specificJobExists;
 }
 
-/*
-This function only console.log jobs in the queue for me o see. It has nothing to do wih my main goal 🥅
-*/
-async function getQueueJobs() {
-  try {
-    const waitingJobs = await collectClanWarData.getJobs("waiting");
-    const activeJobs = await collectClanWarData.getJobs("active");
-    const completedJobs = await collectClanWarData.getJobs("completed");
-    const failedJobs = await collectClanWarData.getJobs("failed");
-    const delayedJobs = await collectClanWarData.getJobs("delayed");
-    const allJobs = await collectClanWarData.getJobs(["waiting", "active", "completed", "failed", "delayed"]);
+export async function doesJobExistsForCollectClanWarLeagueData(jobName: string, clanTag: string) {
+  const jobs = await collectClanWarLeagueData.getJobs(["waiting"]);
+  if (!jobName) throw new Error("🚨 jobName is missing");
 
-    console.log("🥉 Looking at the state of the job");
-    waitingJobs.forEach((job) => {
-      console.log("💤 Waiting", job.id, job.name, job.data);
-    });
-    activeJobs.forEach((job) => {
-      console.log("🤸🏼 Active", job.id, job.name, job.data);
-    });
-    completedJobs.forEach((job) => {
-      console.log("✅ Completed", job.id, job.name, job.data);
-    });
-    failedJobs.forEach((job) => {
-      console.log("💩 Failed", job.id, job.name, job.data);
-    });
-    delayedJobs.forEach((job) => {
-      console.log();
-      console.log("⏰ Delayed", job.id, job.name, job.data);
-    });
-  } catch (error) {
-    console.error("Failed to fetch jobs from queue:", error);
+  const specificJobExists = jobs.some((job) => job.name === jobName && job.data.clanTag === clanTag);
+  return !!specificJobExists;
+}
+
+export async function logAndRemoveJobs(queueName: string) {
+  const jobs = await collectClanWarLeagueData.getJobs(["waiting", "delayed"]);
+
+  if (jobs.length === 0) {
+    console.log(`Inga jobb väntar i kön "${queueName}"`);
+    return;
   }
+
+  console.log(`Följande jobb väntar i kön "${queueName}":`);
+  jobs.forEach((job) => {
+    console.log(`Jobb ID: ${job.id}, Data:`, job.data);
+  });
+
+  // Ta bort alla väntande och försenade jobb
+  await Promise.all(jobs.map((job) => job.remove()));
+  console.log(`Alla jobb i kön "${queueName}" har tagits bort.`);
 }

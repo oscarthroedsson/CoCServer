@@ -28,6 +28,17 @@ export async function doesClanWarLeagueGroupClanExist_clashyStats(clanTag: strin
   }
 }
 
+export async function doesClanWarLeagueRoundExist_clashyStats(groupID: number, roundNumber: number) {
+  const round = await prisma.clanWarLeagueRound.findFirst({
+    where: {
+      groupId: groupID,
+      roundNumber: roundNumber,
+    },
+  });
+
+  return !!round;
+}
+
 export async function doesClanWarLeagueMatchExist_clashyStats(uniqueKeys: { clanOneTag: string; clanTwoTag: string }) {
   const match = await prisma.clanWarLeagueMatch.findFirst({
     where: {

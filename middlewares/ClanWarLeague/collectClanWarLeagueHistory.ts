@@ -9,8 +9,6 @@ import {
   storeClanWarLeagueRound_ClashyStats,
   storeClanWarLeagueSeason_ClashyStats,
 } from "../../service/ClanWarLeague/clanWarLeague_service";
-import { storePlayer_clashyStats } from "../../service/Player/player_service";
-import { ClanWarLeagueMatch_clashyClash } from "../../types/ClashyStats/clanWarLeague.types";
 import { doesClanExist_clashyStats } from "../../validation/Clan/doesClanExist";
 import { doesPlayerExist_clashyStats } from "../../validation/Player/doesPlayerExist";
 import { onBoard_Player } from "../Onboarding/player_Onboarding";
@@ -30,6 +28,7 @@ export async function collectClanWarLeagueHistory(clanTag: string) {
   };
 
   while (rounds !== 0) {
+    // This is an upsert, if exist it returns, if not it creates and returns
     const { id: seasonID } = await storeClanWarLeagueSeason_ClashyStats(year, month);
 
     console.log("Season ID:", seasonID);
@@ -41,30 +40,46 @@ export async function collectClanWarLeagueHistory(clanTag: string) {
       tag: clan.tag,
       name: clan.name,
     }));
+
     groupObject.clans = clans;
     for (const clan of clans) {
       const doesClanExist = await doesClanExist_clashyStats(clan.tag);
       if (!doesClanExist) {
+        console.log("🚓 doesClanExist: ", doesClanExist);
         await storeClan_ClashyStats({ tag: clan.tag, name: clan.name });
         console.log("🟢 Clan added to DB: ", clan.tag, " | ", clan.name);
       }
     }
-    const allMembers = cwlGroupHistory.clans.flatMap((clan: { members: { tag: string; name: string }[] }) =>
-      clan.members.map((member: { tag: string; name: string }) => ({
-        tag: member.tag,
-        name: member.name,
-      }))
+
+    const allMembers = cwlGroupHistory.clans.flatMap(
+      (clan: { tag: string; members: { tag: string; name: string }[] }) =>
+        clan.members.map((member: { tag: string; name: string }) => ({
+          tag: member.tag,
+          name: member.name,
+          clanTag: clan.tag,
+        }))
     );
+
     console.log("⏰ 😴 Adding members ");
+
     for (const member of allMembers) {
+      if (!member || !member.tag) continue;
+
       const doesMemberExist = await doesPlayerExist_clashyStats(member.tag);
       if (!doesMemberExist) {
-        await onBoard_Player(member.tag);
+        await onBoard_Player({
+          gameTag: member.tag,
+          gameName: member.name,
+          clanTag: member.clanTag,
+          email: null,
+          acceptTerms: false,
+        });
       }
     }
     console.log("📦 added all members", allMembers.length, " st");
     groupObject.members = allMembers;
 
+    // ---------------------------------------- 🧺 ADD TO DB ----------------------------------------
     const { id: groupID } = await storeClanWarLeagueGroup_clashyStats(seasonID);
     await storeClanWarLeagueGroupClan_ClashyStats(groupID, clans);
 
@@ -80,6 +95,7 @@ export async function collectClanWarLeagueHistory(clanTag: string) {
         const allAttacks = [...round.clanOneStats.attacks, ...round.clanTwoStats.attacks];
         for (const attack of allAttacks) {
           attack.matchId = matchID;
+          console.log("🪖🪖🪖 attack: ", attack);
           await storeClanWarLeagueAttack_ClashyStats(attack);
         }
         console.log("🥕 All Attacks added to DB: ", allAttacks.length);

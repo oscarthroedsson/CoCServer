@@ -1,3 +1,4 @@
+import { delay } from "bullmq";
 import { ClanWarLeagueMatch_clashyClash } from "../types/ClashyStats/clanWarLeague.types";
 import {
   CWLMatchObjectMemberList_Supercell,
@@ -28,8 +29,8 @@ export function convertToCWLMatchObject(
       stars: clanOne.stars,
       destructionPercentage: clanOne.destructionPercentage,
       //@ts-ignore
-      attacks: clanOne.members.flatMap((member: CWLMatchObjectMemberList_Supercell) => {
-        return convertToAttackObject(member);
+      attacks: clanOne.members.flatMap((member: CWLMatchObjectMemberList_Supercell, index: number) => {
+        return convertToAttackObject(member, index);
       }),
     },
     clanTwoStats: {
@@ -37,8 +38,8 @@ export function convertToCWLMatchObject(
       stars: clanOne.stars,
       destructionPercentage: clanOne.destructionPercentage,
       //@ts-ignore
-      attacks: clanTwo.members.flatMap((member: CWLMatchObjectMemberList_Supercell) => {
-        return convertToAttackObject(member);
+      attacks: clanTwo.members.flatMap((member: CWLMatchObjectMemberList_Supercell, index: number) => {
+        return convertToAttackObject(member, index);
       }),
     },
     winner:

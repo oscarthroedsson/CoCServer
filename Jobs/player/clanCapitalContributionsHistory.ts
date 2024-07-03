@@ -9,7 +9,6 @@ export async function job_clanCapitalContributionsHistory() {
   const playersTag = await getAllPlayers_clashyStats();
 
   for (const player of playersTag) {
-    console.log(player);
     // get the latest contributions of the player
     const latestContributions = await getLatestClanCapitalContributions_clashyStats(player.gameTag);
     // get the player object from supercell for relevant total capital contributions

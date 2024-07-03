@@ -26,7 +26,6 @@ export async function job_leavesAndJoinsClan() {
   /*
   Go threw every clan we have in our DB
   */
-
   for (const clanTag of clanTags) {
     // get latest list of members
     const previousMemberList = await getLatestClanMemberRecord_clashyStats(clanTag.clanTag);

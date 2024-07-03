@@ -13,4 +13,5 @@ export type CronSchedules = {
   Every_Sunday: string;
   Every_LastDayOfMonth: string;
   Every_FirstDayOfMonth: string;
+  Every_DayFirstWeekOfMonth: string;
 };

@@ -1,13 +1,7 @@
 import prisma from "../../prisma";
 
-import { changeToURLencoding } from "../../utils/helpers/urlEncoding";
-import { CwlMatchObject } from "../../models/types/cwlMatchObject.types";
-import { Prisma } from "@prisma/client";
-
-import { ClanWarLeagueAttack } from "../types/clanWarLeague.types";
 import {
   ClanWarLeagueAttack_clashyClash,
-  ClanWarLeagueGroup_clashyClash,
   ClanWarLeagueMatch_clashyClash,
 } from "../../types/ClashyStats/clanWarLeague.types";
 import { connect } from "http2";
@@ -32,11 +26,26 @@ export async function getClanWarLeagueSeason_ClashyStats() {}
 export async function storeClanWarLeagueGroup_clashyStats(seasonId: number) {
   return await prisma.clanWarLeagueGroup.create({
     data: {
-      seasonId: seasonId,
+      seasonId,
     },
   });
 }
-export async function getClanWarLeagueGroup_clashyStats(seasonId: number, month: number) {}
+
+export async function getClanWarLeagueGroup_clashyStats(seasonId: number) {
+  return await prisma.clanWarLeagueGroup.findFirst({
+    where: {
+      seasonId: seasonId,
+    },
+    include: {
+      groupClans: true,
+      rounds: {
+        include: {
+          matches: true,
+        },
+      },
+    },
+  });
+}
 
 export async function storeClanWarLeagueGroupClan_ClashyStats(groupId: number, clans: { tag: string; name: string }[]) {
   try {
@@ -61,6 +70,17 @@ export async function storeClanWarLeagueRound_ClashyStats(groupID: number, round
   });
 }
 
+export async function getClanWarLeagueRound_ClashyStats(
+  groupID: number,
+  roundNumber: number
+): Promise<{ id: number; groupId: number; roundNumber: number } | undefined | null> {
+  return await prisma.clanWarLeagueRound.findFirst({
+    where: {
+      groupId: groupID,
+      roundNumber: roundNumber,
+    },
+  });
+}
 export async function storeClanWarLeagueMatch_ClashyStats(roundID: number, match: ClanWarLeagueMatch_clashyClash) {
   try {
     return await prisma.clanWarLeagueMatch.create({
@@ -90,6 +110,7 @@ export async function storeClanWarLeagueAttack_ClashyStats(attack: ClanWarLeague
     return await prisma.clanWarLeagueAttack.create({
       data: {
         matchId: attack.matchId,
+        attack: attack.attack,
         attackerPlayerTag: attack.attackerPlayerTag,
         defenderPlayerTag: attack.defenderPlayerTag,
         stars: attack.stars,

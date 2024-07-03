@@ -1,10 +1,11 @@
 import { CWLMatchObjectMemberList_Supercell } from "../types/Supercell/clanWarLeague.types";
 
-export function convertToAttackObject(clanMember: CWLMatchObjectMemberList_Supercell) {
+export function convertToAttackObject(clanMember: CWLMatchObjectMemberList_Supercell, index: number) {
   if (!clanMember.attacks) {
     return [
       {
         matchId: 0,
+        attack: index,
         attackerPlayerTag: clanMember.tag,
         defenderPlayerTag: null,
         stars: 0,
@@ -24,7 +25,7 @@ export function convertToAttackObject(clanMember: CWLMatchObjectMemberList_Super
       stars: attack.stars,
       destructionPercentage: attack.destructionPercentage,
       duration: attack.duration,
-      gotAttacked: false,
+      gotAttacked: clanMember.opponentAttacks > 0 ? true : false,
     };
   });
 }

@@ -15,4 +15,5 @@ export const cronExecutionTime: CronSchedules = {
   Every_Sunday: "0 0 * * 0",
   Every_LastDayOfMonth: "0 0 28-31 * *",
   Every_FirstDayOfMonth: "0 0 1 * *",
+  Every_DayFirstWeekOfMonth: "0 0 1-11 * *",
 };
