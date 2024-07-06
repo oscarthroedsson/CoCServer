@@ -102,18 +102,6 @@ export async function onBoard_ClanMembers(clanTag: string) {
       console.log("🚨 Do not Exist", playerExist, " | ", member.tag, " | ", member.name);
       const playerData = await getPlayer_superCell(member.tag);
 
-      // if (!playerData) {
-      //   await registerPlayer_clashyStats({
-      //     gameTag: member.tag,
-      //     email: null,
-      //     clanTag: clan.tag,
-      //     gameName: member.name,
-      //     acceptTerms: false,
-      //   });
-      //   console.error("❗❗ Player data not found", member.tag);
-      //   continue;
-      // }
-
       if (!playerData.tag || !playerData.clan.tag || !playerData.name) continue;
       await registerPlayer_clashyStats({
         gameTag: playerData ? playerData.tag : member.tag,
@@ -143,6 +131,7 @@ export async function onBoard_ClanMemberRegister(clanTag: string) {
       gameName: member.name,
     });
   });
+
   // validate this
   addClanMemberRecord({ clanTag: clanTag, clanMembers: members });
 }

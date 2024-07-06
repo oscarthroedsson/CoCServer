@@ -11,6 +11,7 @@ import {
   doesCapitalRaidsExist_clashyClash,
   doesClanCapitalRaidExits_clashyClash,
 } from "../../validation/clanCapital/clanCapital_validation";
+import { onBoard_ClanAndMembers } from "./clan_Onboarding";
 
 export async function onBoarding_ClanCapital(clanTag: string) {
   let raidID: number | undefined = 0;
@@ -68,6 +69,7 @@ export async function onBoarding_ClanCapital(clanTag: string) {
         );
 
         if (clanCapitalRaidExist) break; // 🚨 if the raid exist break, becuase if it exist the attacks exist
+
         const clanCapitalRaidResponse = await storeClanCapitalRaid_clashyClash(
           raidID,
           index + 1,

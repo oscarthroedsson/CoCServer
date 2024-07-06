@@ -1,4 +1,5 @@
 import { getClan_superCell } from "../../API/Clan/clan_Api";
+import { onBoard_ClanMemberRegister } from "../../middlewares/Onboarding/clan_Onboarding";
 import {
   getAllClans_clashyStats,
   getJoinedAndLeaveClanHistory,
@@ -7,11 +8,7 @@ import {
   updateJoinedAndLeaveClanHistory,
 } from "../../service/Clan/clan_service";
 import { ClanMemberRecordObject, MemberShipChangesObject } from "../../types/ClashyStats/clanMemberRecord.types";
-import {
-  ClanMemberHistoryObject,
-  LatestClanMembers,
-  LatestClanMembersObject,
-} from "../../types/ClashyStats/latestClanMembers.types";
+import { LatestClanMembersObject } from "../../types/ClashyStats/latestClanMembers.types";
 
 /**
  * @description Will look who leavees and join the clan
@@ -30,7 +27,8 @@ export async function job_leavesAndJoinsClan() {
     // get latest list of members
     const previousMemberList = await getLatestClanMemberRecord_clashyStats(clanTag.clanTag);
     if (!previousMemberList) {
-      throw new Error("No member record found");
+      await onBoard_ClanMemberRegister(clanTag.clanTag); // if no record is found, onboard the clan
+      continue;
     }
 
     const currentMembersList = await getClan_superCell(clanTag.clanTag);

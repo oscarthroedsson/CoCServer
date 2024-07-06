@@ -14,14 +14,14 @@ import { convertToAttackObject } from "./convertToAttackObject";
  * @param clanTwo - opponent.tag
  */
 export function convertToCWLMatchObject(
-  id: number,
-  round: number,
+  groupID: number,
+  roundIndex: number,
   clanOne: ClanWarLeagueMatchClanObject_Supercell,
   clanTwo: ClanWarLeagueMatchClanObject_Supercell
 ): ClanWarLeagueMatch_clashyClash {
   return {
-    roundId: round,
-    round: id,
+    roundId: groupID,
+    round: roundIndex,
     clanOneData: { tag: clanOne.tag, name: clanOne.name },
     clanTwoData: { tag: clanTwo.tag, name: clanTwo.name },
     clanOneStats: {

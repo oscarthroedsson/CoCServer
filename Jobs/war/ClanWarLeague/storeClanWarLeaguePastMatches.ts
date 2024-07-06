@@ -21,7 +21,6 @@ export async function storeClanWarLeaguePastMatches(
 
   const roundExist = await doesClanWarLeagueRoundExist_clashyStats(groupID, roundIndex);
 
-  console.log({ groupID, roundIndex, roundExist });
   if (!roundExist) {
     const { id: theRoundID } = await storeClanWarLeagueRound_ClashyStats(groupID, roundIndex);
     roundID = theRoundID;

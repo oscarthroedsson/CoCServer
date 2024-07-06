@@ -14,7 +14,6 @@ import { convertToCorrectDateObject } from "../../../utils/helpers/converToCorre
 import { doesClanExist_clashyStats } from "../../../validation/Clan/doesClanExist";
 
 //DAET-FNS FUNCTIONS
-import { isAfter } from "date-fns";
 import { storeClanWarLeaguePastMatches } from "./storeClanWarLeaguePastMatches";
 import {
   doesClanWarLeagueGroupExist_clashyStats,
@@ -24,7 +23,6 @@ import { addJob_collectClanWarLeagueData, logAndRemoveJobs } from "../../../Queu
 
 export async function checkIfClanWarLeagueIsActive() {
   const hadReasonArray: { clanTag: string; reason: string }[] = [];
-  console.log("🌈 Checking if clan is at CWL");
   const currentDate = new Date();
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth() + 1; // Lägg till 1 för att få rätt månad
@@ -36,7 +34,7 @@ export async function checkIfClanWarLeagueIsActive() {
   for (const clan of allClans) {
     console.log("🏷️ Clan Tag: ", clan.clanTag);
     const cwlGroup = await getClanWarLeagueGroup_superCell(clan.clanTag);
-    console.log("🚓 cwlGroup: ", !!cwlGroup);
+
     if (cwlGroup?.reason) {
       hadReasonArray.push({ clanTag: clan.clanTag, reason: cwlGroup.reason });
       continue;
@@ -82,9 +80,9 @@ export async function checkIfClanWarLeagueIsActive() {
       let stopLoop = false;
 
       // 🍭 Looping over every wartag
-      for (const tag of round.warTags) {
+      for (const warTag of round.warTags) {
         // 🚓 If we found #0 Matches haven´t been played
-        if (tag === "#0") {
+        if (warTag === "#0") {
           stopLoop = true;
           break;
         }
@@ -92,10 +90,11 @@ export async function checkIfClanWarLeagueIsActive() {
         const roundExist = await doesClanWarLeagueRoundExist_clashyStats(groupID, roundIndex);
         console.log("🚓 roundExist: ", roundExist);
         if (roundExist) continue;
-        const cwlMatch = await getClanWarLeagueRoundMatch_superCell(tag);
+        const cwlMatch = await getClanWarLeagueRoundMatch_superCell(warTag);
 
         console.log("🚓 cwlMatch: ", !!cwlMatch);
         if (!cwlMatch) continue;
+
         const roundEndTime = convertToCorrectDateObject(cwlMatch.endTime).fulldate;
         console.log("⏳ ROUND END TIME: ", roundEndTime);
 
@@ -104,11 +103,11 @@ export async function checkIfClanWarLeagueIsActive() {
           continue;
         }
 
-        await addJob_collectClanWarLeagueData(roundEndTime, clan.clanTag);
+        await addJob_collectClanWarLeagueData(groupID, roundIndex, clan.clanTag, roundEndTime, warTag);
       }
       if (stopLoop) break;
     }
   }
   console.log("🌈 hadReasonArray: ", hadReasonArray);
-  await logAndRemoveJobs("collectClanWarLeagueInfo");
+  // await logAndRemoveJobs("collectClanWarLeagueInfo");
 }

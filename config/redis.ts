@@ -7,4 +7,8 @@ const redisConnection = new IORedis({
   maxRetriesPerRequest: null,
 });
 
+redisConnection.on("connect", () => {
+  console.log("redos.ts | connected to redis");
+});
+
 export { redisConnection };

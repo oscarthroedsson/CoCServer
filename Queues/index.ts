@@ -1,7 +1,10 @@
-import { Queue, Worker, Job } from "bullmq";
-import { collectClanWar } from "../Jobs/war/ClanWar/collectClanWar";
-import { createClient } from "redis";
 import { redisConnection } from "../config/redis";
+import { Queue, Worker, Job } from "bullmq";
+
+// import { createClient } from "redis";
+
+import { collectClanWarLeaugeMatch } from "../Jobs/war/ClanWarLeague/collectClanWarLeaugeMatch";
+import { collectClanWar } from "../Jobs/war/ClanWar/collectClanWar";
 
 /*
 Queue, worker and job, all needs the same name names to work together.
@@ -10,17 +13,17 @@ Queue, worker and job, all needs the same name names to work together.
 ⇛ await testQueue.add("→ collectClanWarInfo ←", ()=>{});
 */
 
-const client = createClient({
-  password: process.env.REDIS_PASWORD,
-  socket: {
-    host: process.env.REDIS_HOST,
-    port: Number(process.env.REDIS_PORT),
-  },
-});
+// const client = createClient({
+//   password: "MBvK0hGBtH3OEebTlnzjnXL83LTi4nWd",
+//   socket: {
+//     host: "redis-18505.c328.europe-west3-1.gce.redns.redis-cloud.com",
+//     port: Number(process.env.REDIS_PORT),
+//   },
+// });
 
-client.on("connect", () => {
-  console.log("connected to redis");
-});
+// client.on("connect", () => {
+//   console.log("connected to redis");
+// });
 
 /**
  * Represents a queue for tester.
@@ -48,8 +51,8 @@ new Worker(
 new Worker(
   "collectClanWarLeagueInfo",
   async (job) => {
-    console.log("🏁 Worker was run", job.data.clanTag);
-    // collectClanWarLeague(job.data.clanTag);
+    console.log("🏁 Worker collectClanWarLeagueInfo was run", job.data.clanTag);
+    await collectClanWarLeaugeMatch(job.data.groupID, job.data.roundIndex, job.data.clanTag, job.data.warTag);
   },
   { connection: redisConnection, concurrency: 50 }
 );
@@ -79,23 +82,27 @@ export async function addJobb_collectClanWarData(endTime: Date, clanTag: string)
   );
 }
 
-//! needs to implement this logic
-export async function addJob_collectClanWarLeagueData(endTime: Date, clanTag: string) {
-  console.log("💼 Wanted to add job");
+export async function addJob_collectClanWarLeagueData(
+  groupID: number,
+  roundIndex: number,
+  clanTag: string,
+  roundEndTime: Date,
+  warTag: string
+) {
+  console.log("💼 ADDING JOB 💼 ");
   const currentTime = new Date();
-  const timeToScheduleJob = new Date(endTime.getTime() - 5 * 60 * 1000); // 5min before war ends
+  const timeToScheduleJob = new Date(roundEndTime.getTime() - 5 * 60 * 1000); // 5min before war ends
   const delayInMs = timeToScheduleJob.getTime() - currentTime.getTime();
   const jobExist = await doesJobExistsForCollectClanWarLeagueData("collectClanWarLeagueInfo", clanTag);
-
-  console.log("data: ", { currentTime, timeToScheduleJob, delayInMs, clanTag, jobExist });
+  if (jobExist) return;
+  console.info({ groupID, roundIndex, clanTag, roundEndTime, warTag, delayInMs });
 
   await collectClanWarLeagueData.add(
     "collectClanWarLeagueInfo",
-    { clanTag },
+    { groupID, roundIndex, clanTag, warTag },
     { removeOnComplete: true, removeOnFail: true, delay: delayInMs }
   );
 }
-
 /**
  *
  * @param jobName string collectClanWarInfo | monkey | banana
