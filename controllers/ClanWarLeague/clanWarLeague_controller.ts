@@ -2,15 +2,24 @@ import { Request, Response } from "express";
 import { getClanWarLeagueWar } from "../../service/ClanWarLeague/clanWarLeague_service";
 import { convertToCWLWarGroupObject } from "../../models/convertToCWLGroupObject";
 
+/**
+ * 📚 Get a CWL goup based on season (year/month) and the clanTag. Sends back a group object
+ * @param req
+ * @param res
+ */
 export async function getClanWarLeagueGroup(req: Request, res: Response) {
-  console.log("getClanWarLeagueGroup | 🎮 Controller");
   const clanTag = req.body.clanTag;
   const year = req.body.year;
   const month = req.body.month;
+
   try {
     const group = await getClanWarLeagueWar(clanTag, year, month);
-    if (!group) throw new Error("Error while fetching CWL Group");
+    if (!group)
+      throw new Error(
+        `Error while fetching CWL Group | Response from getClanWarLeagueWar: ${group} | getClanWarLeagueWar`
+      );
 
+    // convertnig the group object to a response object so it looks nice
     const responseObject = convertToCWLWarGroupObject(group);
     if (!responseObject) throw new Error("Error while fetching CWL Group");
 

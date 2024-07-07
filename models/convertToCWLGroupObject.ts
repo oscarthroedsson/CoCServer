@@ -1,5 +1,6 @@
 import { CLWGroupResponse_API } from "../types/ClashyStats/clanWarLeague.types";
 
+// todo fix any
 export function convertToCWLWarGroupObject(groupData: any): CLWGroupResponse_API {
   return {
     seasonYear: groupData.seasonYear,

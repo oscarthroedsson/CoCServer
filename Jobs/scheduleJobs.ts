@@ -7,6 +7,10 @@ import { job_leavesAndJoinsClan } from "./clan/leavesAndJoinsClan";
 import { checkIfClanIsAtWar } from "./war/ClanWar/checkIfClanIsAtWar";
 import { job_collectClanCapitalData } from "./clanCapital/collectClanCapitalData";
 import { checkIfClanWarLeagueIsActive } from "./war/ClanWarLeague/checkIfClanWarLeagueIsActive";
+import { timeZones } from "../utils/constants/timezones_constant";
+import { time } from "console";
+
+const timeZone = timeZones.Europe_Stockholm;
 
 export function scheduleJobs() {
   // 🏗️ Collect -> 🏆 Trophys -> 👬🏼 Join and Leaves Clan
@@ -21,7 +25,7 @@ export function scheduleJobs() {
       job_leavesAndJoinsClan();
     },
     {
-      timezone: "Europe/Stockholm",
+      timezone: timeZone,
     }
   );
 
@@ -47,7 +51,7 @@ export function scheduleJobs() {
       }
     },
     {
-      timezone: "Europe/Stockholm",
+      timezone: timeZone,
     }
   );
 
@@ -61,7 +65,7 @@ export function scheduleJobs() {
     async () => {
       await checkIfClanIsAtWar();
     },
-    { timezone: "Europe/Stockholm" }
+    { timezone: timeZone }
   );
 
   /**
@@ -81,8 +85,6 @@ export function scheduleJobs() {
     async () => {
       await job_collectClanCapitalData();
     },
-    { timezone: "Europe/Stockholm" }
+    { timezone: timeZone }
   );
-
-  console.log("⏰ | Jobs are scheduled!");
 }

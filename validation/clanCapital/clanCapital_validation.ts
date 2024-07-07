@@ -1,14 +1,20 @@
 import prisma from "../../prisma";
 
 export async function doesCapitalRaidsExist_clashyClash(clanTag: string, month: number, year: number) {
-  const foundClan = await prisma.capitalRaids.findFirst({
-    where: {
-      clanTag: clanTag,
-      seasonMonth: month,
-      seasonYear: year,
-    },
-  });
-  return foundClan;
+  try {
+    const foundClan = await prisma.capitalRaids.findFirst({
+      where: {
+        clanTag: clanTag,
+        seasonMonth: month,
+        seasonYear: year,
+      },
+    });
+    return foundClan;
+  } catch (error) {
+    throw new Error(
+      `Error while fetching clan capital raids | Error: ${error} | fn: doesCapitalRaidsExist_clashyClash`
+    );
+  }
 }
 
 export async function doesClanCapitalRaidExits_clashyClash(
@@ -16,25 +22,37 @@ export async function doesClanCapitalRaidExits_clashyClash(
   clanName: string,
   defender: string
 ): Promise<boolean> {
-  const foundClan = await prisma.capitalRaid.findFirst({
-    where: {
-      id: id,
-      clanName: clanName,
-      defender: defender,
-    },
-  });
-  return !!foundClan;
+  try {
+    const foundClan = await prisma.capitalRaid.findFirst({
+      where: {
+        id: id,
+        clanName: clanName,
+        defender: defender,
+      },
+    });
+    return !!foundClan;
+  } catch (error) {
+    throw new Error(
+      `Error while fetching clan capital raid | Error: ${error} | fn: doesClanCapitalRaidExits_clashyClash`
+    );
+  }
 }
 
 export async function doesClanCapitalDistrictsExist_clashyClash(id: number, district: string) {
-  const foundDistrict = await prisma.capitalDistricts.findFirst({
-    where: {
-      capitalRaidId: id,
-      district: district,
-    },
-  });
+  try {
+    const foundDistrict = await prisma.capitalDistricts.findFirst({
+      where: {
+        capitalRaidId: id,
+        district: district,
+      },
+    });
 
-  return !!foundDistrict;
+    return !!foundDistrict;
+  } catch (error) {
+    throw new Error(
+      `Error while fetching clan capital districts | Error: ${error} | fn: doesClanCapitalDistrictsExist_clashyClash`
+    );
+  }
 }
 
 export async function doesCapitalDistrictAttacksExist_clashyClash(
@@ -45,15 +63,21 @@ export async function doesCapitalDistrictAttacksExist_clashyClash(
   year: number,
   month: number
 ) {
-  const foundAttack = await prisma.capitalDistrictAttacks.findFirst({
-    where: {
-      capitalDistrictsId: capitalDistrictsId,
-      districtName: districtName,
-      attack: attack,
-      playerTag: playerTag,
-      seasonYear: year,
-      seasonMonth: month,
-    },
-  });
-  return !!foundAttack;
+  try {
+    const foundAttack = await prisma.capitalDistrictAttacks.findFirst({
+      where: {
+        capitalDistrictsId: capitalDistrictsId,
+        districtName: districtName,
+        attack: attack,
+        playerTag: playerTag,
+        seasonYear: year,
+        seasonMonth: month,
+      },
+    });
+    return !!foundAttack;
+  } catch (error) {
+    throw new Error(
+      `Error while fetching capital district attacks | Error: ${error} | fn: doesCapitalDistrictAttacksExist_clashyClash`
+    );
+  }
 }

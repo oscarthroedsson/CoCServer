@@ -28,6 +28,7 @@ export async function job_collectClanCapitalData() {
   /*
   📚 We use year(YYYY) and month(MM) to divide all the data in seasons
   */
+
   //? should we look on the dates on the onGoing raid instead?
   const thisYear = presentDate.getFullYear(); // get the year
   const thisMonth = presentDate.getMonth() + 1; // get the month
@@ -36,13 +37,15 @@ export async function job_collectClanCapitalData() {
   for (const clan of allClans) {
     // get the clan capital data from the supercell APIs for the specific clan we are looping
     const clanCapitalData = await getClanCapital_superCell(clan.clanTag);
-    let raidID: number | undefined = 0; // we need to store the raidID so we can store the specific raids
 
     // We find the raid that is ongoing for this week and month
     const thisMonthRaids = clanCapitalData.items.filter((raid) => {
       const raidDate = convertToCorrectDateObject(raid.startTime).fulldate;
+
+      // 📚 We check for on going becuase we fetch before it ends
       return isSameMonth(raidDate, presentDate) && raid.state === "ongoing";
     });
+
     const capitalRaidsExist = await doesCapitalRaidsExist_clashyClash(clan.clanTag, thisMonth, thisYear); // check if the monthly column exist in out DB
 
     /*  

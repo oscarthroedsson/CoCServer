@@ -34,7 +34,6 @@ import { doesClanWarAttackExist_clashyStats } from "../../validation/war/doesCla
  * @param clanTag - The tag of the clan to collect war history for.
  */
 export async function collectClanWarHistory(clanWarObject: ClanWarObject_Supercell) {
-  console.log("🚂 Collect clan war history");
   const startTime: Date = convertToCorrectDateObject(clanWarObject.startTime).fulldate;
   const endTime: Date = convertToCorrectDateObject(clanWarObject.endTime).fulldate;
 
@@ -42,7 +41,6 @@ export async function collectClanWarHistory(clanWarObject: ClanWarObject_Superce
   const opponentExist = await doesClanExist_clashyStats(clanWarObject.opponent.tag);
   if (!opponentExist) {
     try {
-      console.log("🏁 Onboarding a clan: ", clanWarObject.clan.tag, clanWarObject.clan.name);
       await onBoard_Clan(clanWarObject.opponent.tag);
     } catch (e) {
       console.error("🚨🚨🚨 collectClanWarHistory", e);
@@ -52,20 +50,16 @@ export async function collectClanWarHistory(clanWarObject: ClanWarObject_Superce
   const clanExists = await doesClanExist_clashyStats(clanWarObject.clan.tag);
   if (!clanExists) {
     try {
-      console.log("🏁 Onboarding a clan: ", clanWarObject.clan.tag, clanWarObject.clan.name);
       await onBoard_Clan(clanWarObject.clan.tag);
     } catch (e) {
-      console.error("🚨🚨🚨 collectClanWarHistory", e);
       return;
     }
 
     // 📚 Validating if clan andopponents member exist
     for (const member of clanWarObject.clan.members) {
-      if (!member.tag) {
-        console.error("🚨🚨🚨 collectClanWarHistory", member.tag);
-      }
-      const playerExist = await doesPlayerExist_clashyStats(member.tag);
+      if (!member.tag) continue;
 
+      const playerExist = await doesPlayerExist_clashyStats(member.tag);
       if (!playerExist) {
         try {
           await onBoard_Player({
@@ -83,13 +77,9 @@ export async function collectClanWarHistory(clanWarObject: ClanWarObject_Superce
   }
 
   for (const opponentMember of clanWarObject.opponent.members) {
-    if (!opponentMember.tag) {
-      console.error("🚨🚨🚨 collectClanWarHistory", opponentMember.tag);
-      continue;
-    }
+    if (!opponentMember.tag) continue;
 
     const playerExist = await doesPlayerExist_clashyStats(opponentMember.tag);
-
     if (!playerExist) {
       try {
         await onBoard_Player({
@@ -128,27 +118,16 @@ export async function collectClanWarHistory(clanWarObject: ClanWarObject_Superce
   const allAttacks = [...clanMembersAttacks, ...opponentMembersAttacks];
 
   for (const attack of allAttacks) {
-    console.log("🪓 attack OBJECT: ", {
-      matchId: attack.matchId,
-      attackerPlayerTag: attack.attackerPlayerTag,
-      defenderPlayerTag: attack.defenderPlayerTag ?? null,
-      attack: attack.attack,
-    });
-
+    //📚 Validate if the attack already exist, if so, cancle
     const attackExits = await doesClanWarAttackExist_clashyStats({
       matchId: attack.matchId,
       attackerPlayerTag: attack.attackerPlayerTag,
       defenderPlayerTag: attack.defenderPlayerTag ?? null,
       attack: attack.attack,
     });
-    console.log("🪖 attackExits: ", attackExits);
-
     const playerExist = await doesPlayerExist_clashyStats(attack.attackerPlayerTag);
 
-    //? Tar jag bort if- så kommer vi inte kunna lägga till attackdata, fattar inte varför
-    if (!playerExist) return console.log("Player does not exist in the DB", attack.attackerPlayerTag);
-    console.log("playerExist: ", playerExist);
-
+    if (!playerExist) continue;
     if (attackExits || !playerExist) continue;
     await storeClanWarAttack_clashyStats(attack);
   }

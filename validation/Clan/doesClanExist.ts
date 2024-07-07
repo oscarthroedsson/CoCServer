@@ -11,7 +11,6 @@ export async function doesClanExist_clashyStats(clanTag: string): Promise<boolea
 
     return !!clan; // Returns true if clan exists, false otherwise
   } catch (error) {
-    console.error("Error while checking if CLAN exists:", error);
-    throw error; // Rethrow the error for error handling
+    throw new Error(`Erorr while fetching clan | Error: ${error} | fn: doesClanExist_clashyStats`);
   }
 }

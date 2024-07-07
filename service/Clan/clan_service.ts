@@ -4,18 +4,22 @@ import {
   ClanMemberRecord,
   leaveAndJoinClanHistoryObject,
 } from "../../types/ClashyStats/clanMemberRecord.types";
-import { Clan_clashyStats } from "../../types/ClashyStats/clan.types";
 import { LatestClanMembers } from "../../types/ClashyStats/latestClanMembers.types";
 import { addNewClanProps } from "../../types/Register/Register.types";
 
 export function storeClan_ClashyStats(newClan: addNewClanProps) {
-  console.log("🗽 newClan: ", newClan);
-  return prisma.clan.create({
-    data: {
-      clanTag: newClan.tag,
-      clanName: newClan.name,
-    },
-  });
+  try {
+    return prisma.clan.create({
+      data: {
+        clanTag: newClan.tag,
+        clanName: newClan.name,
+      },
+    });
+  } catch (error) {
+    throw new Error(
+      `Error while creating clan: ${newClan.tag} - ${newClan.name} | error: ${error} | fn: getAllClans_clashyStats`
+    );
+  }
 }
 
 export async function getAllClans_clashyStats(): Promise<{ clanTag: string; clanName: string }[]> {
@@ -29,8 +33,7 @@ export async function getAllClans_clashyStats(): Promise<{ clanTag: string; clan
 
     return clans;
   } catch (error) {
-    console.error("Error while updating player:", error);
-    throw error; // Rethrow the error for error handling
+    throw new Error(`Error while fetching all clans | Error: ${error} | fn: getAllClans_clashyStats`);
   }
 }
 
@@ -49,8 +52,9 @@ export async function addClanMemberRecord(clanMembers: ClanMemberRecord) {
       },
     });
   } catch (error) {
-    //todo → Email should be send to oscar.throedsson@gmail.com
-    console.error("Error while updating clan members:", error);
+    throw new Error(
+      `Error while creating clan members: ${clanMembers.clanTag} | error: ${error} | fn: addClanMemberRecord`
+    );
   }
 }
 
@@ -70,8 +74,9 @@ export async function updateClanMemberRecord(clan: ClanMemberRecord) {
       },
     });
   } catch (error) {
-    //todo → Email should be send to oscar.throedsson@gmail.com
-    console.error("Error while updating clan members:", error);
+    throw new Error(
+      `Error while updating clan members: ${clan.clanTag} | error: ${error} | fn: updateClanMemberRecord`
+    );
   }
 }
 
@@ -86,8 +91,7 @@ export async function getLatestClanMemberRecord_clashyStats(clanTag: string): Pr
     //@ts-ignore - TS wont reconize the members type- it conflicts with prisma-schema
     return clanMembers;
   } catch (error) {
-    //todo → Email should be send to oscar.throedsson@gmail.com
-    console.error("Error while getting clan members:", error);
+    // cant throw error and return null
     return null;
   }
 }
@@ -101,8 +105,9 @@ export async function storeJoinedAndLeaveClanHistory(clanTag: string, data: { [k
       },
     });
   } catch (error) {
-    //todo → Email should be send to oscar.throedsson@gmail.com
-    console.error("Error while creating leave and join data:", error);
+    throw new Error(
+      `Error while creating clan members: ${clanTag} | error: ${error} | fn: storeJoinedAndLeaveClanHistory`
+    );
   }
 }
 
@@ -118,23 +123,23 @@ export async function getJoinedAndLeaveClanHistory(
 
     return record as leaveAndJoinClanHistoryObject | null;
   } catch (error) {
-    //todo → Email should be send to oscar.throedsson@gmail.com
-    console.error("Error while fetching leave and join data:", error);
+    throw new Error(
+      `Error while fetching clan members: ${clanTag} | error: ${error} | fn: getJoinedAndLeaveClanHistory`
+    );
   }
 }
 
 export async function updateJoinedAndLeaveClanHistory(recordObject: leaveAndJoinClanHistoryObject) {
   try {
-    await prisma.joinedAndLeaveClanHistory.update({
-      where: {
-        clanTag: recordObject.clanTag,
-      },
+    await prisma.joinedAndLeaveClanHistory.create({
       data: {
+        clanTag: recordObject.clanTag,
         data: recordObject.data as any,
       },
     });
   } catch (error) {
-    //todo → Email should be send to oscar.throedsson@gmail.com
-    console.error("Error while updating leave and join data:", error);
+    throw new Error(
+      `Error while updating clan members: ${recordObject.clanTag} | error: ${error} | fn: updateJoinedAndLeaveClanHistory`
+    );
   }
 }

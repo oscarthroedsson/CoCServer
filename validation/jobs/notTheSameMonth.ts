@@ -1,3 +1,4 @@
+//! We may be able to take away this and use date-fns instead
 export function notTheSameMonth(monthToCompare: Date | undefined) {
   const date = new Date();
   const month = date.getMonth();

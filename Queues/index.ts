@@ -6,25 +6,6 @@ import { Queue, Worker, Job } from "bullmq";
 import { collectClanWarLeaugeMatch } from "../Jobs/war/ClanWarLeague/collectClanWarLeaugeMatch";
 import { collectClanWar } from "../Jobs/war/ClanWar/collectClanWar";
 
-/*
-Queue, worker and job, all needs the same name names to work together.
-⇛ new Queue("→ collectClanWarInfo ←", {connection: redisConnection});
-⇛ new Worker("→ collectClanWarInfo ←",()=>{});
-⇛ await testQueue.add("→ collectClanWarInfo ←", ()=>{});
-*/
-
-// const client = createClient({
-//   password: "MBvK0hGBtH3OEebTlnzjnXL83LTi4nWd",
-//   socket: {
-//     host: "redis-18505.c328.europe-west3-1.gce.redns.redis-cloud.com",
-//     port: Number(process.env.REDIS_PORT),
-//   },
-// });
-
-// client.on("connect", () => {
-//   console.log("connected to redis");
-// });
-
 /**
  * Represents a queue for tester.
  */
@@ -43,7 +24,7 @@ new Worker(
   async (job) => {
     // The worker should contain the logic that needs to be executed for each job
     console.log("🏁 Worker was run", job.data.clanTag);
-    // collectClanWar(job.data.clanTag);
+    collectClanWar(job.data.clanTag);
   },
   { connection: redisConnection, concurrency: 50 }
 );
@@ -103,6 +84,7 @@ export async function addJob_collectClanWarLeagueData(
     { removeOnComplete: true, removeOnFail: true, delay: delayInMs }
   );
 }
+
 /**
  *
  * @param jobName string collectClanWarInfo | monkey | banana

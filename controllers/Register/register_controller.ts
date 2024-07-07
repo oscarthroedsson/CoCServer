@@ -27,16 +27,18 @@ export async function registerNewUser(req: Request<addNewMemberProps>, res: Resp
 
   //look if they exists in clashy stats DB
   const userExist = await doesPlayerExist_clashyStats(gameTag);
+
   try {
     // get payload from superCell
     const playerObject = await getPlayer_superCell(gameTag);
 
     if (userExist) {
-      const player = await getPlayer_clashyClash(gameTag); // get player from clashyStats database
       /*
-        if player exist and email is null and acceptTerms is false we know they where added 
-         when someone else in the clan was registered
+      📚 If user exist it has already registered, or been added when we collect data. 
+      We need to check if they have email and acceptTerms set, if not we update the user so we know they have volentary accepted the terms
       */
+      const player = await getPlayer_clashyClash(gameTag); // get player from clashyStats database
+
       if (player?.email === null && player.acceptTerms === false) {
         updatePlayer_clashyStats({
           clanTag: playerObject.clan.tag ? playerObject.clan.tag : null,
@@ -53,7 +55,6 @@ export async function registerNewUser(req: Request<addNewMemberProps>, res: Resp
       }
     } else {
       // if user does not exist, register user
-
       await registerPlayer_clashyStats({
         gameTag: playerObject.tag,
         clanTag: playerObject.clan.tag ? playerObject.clan.tag : null,
@@ -68,7 +69,8 @@ export async function registerNewUser(req: Request<addNewMemberProps>, res: Resp
     }
 
     // 🚨 We do not continue of the player aren´t in a clan
-    if (!playerObject.clan.tag) return;
+    // 📚 All this is happening in the background and the user does not have to wait for this to be done
+    if (!playerObject.clan?.tag) return;
 
     const clan = await getClan_superCell(playerObject.clan.tag);
     if (!clan) return; // 🚨 Abort if something goes wrong

@@ -12,8 +12,7 @@ export async function getPlayer_clashyClash(gameTag: string): Promise<PlayerProf
 
     return player;
   } catch (error) {
-    console.error("Error while checking if clan exists:", error);
-    throw error; // Rethrow the error for error handling
+    throw new Error(`Error while fetching player | Error: ${error} | fn: getPlayer_clashyClash`);
   }
 }
 
@@ -27,8 +26,7 @@ export async function getAllPlayers_clashyStats() {
 
     return player;
   } catch (error) {
-    console.error("Error while updating player:", error);
-    throw error; // Rethrow the error for error handling
+    throw new Error(`Error while fetching player | Error: ${error} | fn: getAllPlayers_clashyStats`);
   }
 }
 
@@ -43,19 +41,22 @@ export async function updatePlayer_clashyStats(playerObject: addNewMemberProps) 
 
     return player;
   } catch (error) {
-    console.error("Error while updating player:", error);
-    throw error; // Rethrow the error for error handling
+    throw new Error(`Error while updating player | Error: ${error} | fn: updatePlayer_clashyStats`);
   }
 }
 
 export function storePlayer_clashyStats(playerObject: PlayerProfilClashyStats) {
-  return prisma.user.create({
-    data: {
-      gameTag: playerObject.gameTag,
-      gameName: playerObject.gameName,
-      clanTag: playerObject.clanTag,
-      email: playerObject.email,
-      acceptTerms: playerObject.acceptTerms,
-    },
-  });
+  try {
+    return prisma.user.create({
+      data: {
+        gameTag: playerObject.gameTag,
+        gameName: playerObject.gameName,
+        clanTag: playerObject.clanTag,
+        email: playerObject.email,
+        acceptTerms: playerObject.acceptTerms,
+      },
+    });
+  } catch (error) {
+    throw new Error(`Error while storing player | Error: ${error} | fn: storePlayer_clashyStats`);
+  }
 }

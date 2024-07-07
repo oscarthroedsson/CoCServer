@@ -13,8 +13,9 @@ export async function getLatestTrophyHistory_clashyStats(gameTag: string) {
 
     return latestTrophyHistory;
   } catch (error) {
-    console.error("Error while fetching latest trophy history:", error);
-    throw error; // Rethrow the error for error handling
+    throw new Error(
+      `Error while fetching latest trophy history | Error: ${error} | fn: getLatestTrophyHistory_clashyStats`
+    );
   }
 }
 
@@ -31,8 +32,9 @@ export async function getPlayersTrophyHistory_clashyStats(gameTag: string) {
 
     return latestTrophyHistory;
   } catch (error) {
-    console.error("Error while fetching latest trophy history:", error);
-    throw error; // Rethrow the error for error handling
+    throw new Error(
+      `Error while fetching latest trophy history | Error: ${error} | fn: getPlayersTrophyHistory_clashyStats`
+    );
   }
 }
 
@@ -47,7 +49,6 @@ export async function addTrophyHistory_clashyStats(data: TrophyHistory) {
 
     return player;
   } catch (error) {
-    console.error("Error while updating player:", error);
-    throw error; // Rethrow the error for error handling
+    throw new Error(`Error while updating player | Error: ${error} | fn: addTrophyHistory_clashyStats`);
   }
 }

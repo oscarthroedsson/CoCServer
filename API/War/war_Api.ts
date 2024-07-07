@@ -16,10 +16,9 @@ export async function isClanAtWar_superCell(clanTag: string) {
     });
 
     const data = await response.json();
-    if (data.state === "inWar" || data.state === "preparations") return data;
     return data;
   } catch (err) {
-    console.log("🚨 ", err);
+    throw new Error(`Error while fetching clan war | clanTag: ${clanTag} | Error: ${err} | fn: isClanAtWar_superCell`);
   }
 }
 
@@ -33,15 +32,17 @@ export async function getCurrentWar_superCell(clanTag: string) {
     });
 
     const data = await response.json();
-    if (data.state === "inWar") return data;
     return data;
   } catch (err) {
-    console.log("🚨 ", err);
+    throw new Error(
+      `Error while fetching current war | clanTag: ${clanTag} | Error: ${err} | fn: getCurrentWar_superCell`
+    );
   }
 }
 
 export async function getClanWarLog_superCell(clanTag: string): Promise<WarLogData | undefined> {
   const convertedClanTag = changeToURLencoding(clanTag); //change # to %23
+
   try {
     const response = await fetch(`https://cocproxy.royaleapi.dev/v1/clans/${convertedClanTag}/warlog`, {
       headers: {
@@ -51,7 +52,8 @@ export async function getClanWarLog_superCell(clanTag: string): Promise<WarLogDa
     const data = await response.json();
     return data;
   } catch (err) {
-    console.log("🚨 ", err);
-    return undefined;
+    throw new Error(
+      `Error while fetching clan war log | clanTag: ${clanTag} | Error: ${err} | fn: getClanWarLog_superCell`
+    );
   }
 }

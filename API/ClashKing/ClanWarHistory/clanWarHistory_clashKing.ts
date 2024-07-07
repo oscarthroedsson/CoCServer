@@ -13,6 +13,8 @@ export async function getClanWarHistory_ClashKing(clanTag: string) {
 
     return data;
   } catch (e) {
-    console.error("🚨🚨🚨 getClanWarHistory_ClashKing", e);
+    throw new Error(
+      `Error while fetching clan war history | clanTag: ${clanTag} | Error: ${e} | fn:getClanWarHistory_ClashKing`
+    );
   }
 }

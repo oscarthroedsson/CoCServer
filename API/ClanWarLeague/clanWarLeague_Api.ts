@@ -13,7 +13,9 @@ export async function getClanWarLeagueGroup_superCell(clanTag: string) {
     const data = await response.json();
     return data;
   } catch (err) {
-    console.error("❌ Error: ", err);
+    throw new Error(
+      `Error while fetching clan war league group | clanTag: ${clanTag} | Error: ${err} | fn:getClanWarLeagueGroup_superCell`
+    );
   }
 }
 
@@ -29,6 +31,8 @@ export async function getClanWarLeagueRoundMatch_superCell(warTag: string) {
     const data = await response.json();
     return data;
   } catch (err) {
-    console.error("❌ Error: ", err);
+    throw new Error(
+      `Error while fetching CWL match data | warTag: ${warTag} | Error: ${err} | fn:getClanWarLeagueRoundMatch_superCell`
+    );
   }
 }

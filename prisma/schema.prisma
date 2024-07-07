@@ -60,10 +60,13 @@ model LatestClanMembers {
 }
 
 model JoinedAndLeaveClanHistory {
-  id      Int    @id @default(autoincrement()) @db.UnsignedInt
-  clan    Clan   @relation(fields: [clanTag], references: [clanTag])
-  clanTag String @unique
-  data    Json
+  id        Int      @id @default(autoincrement()) @db.UnsignedInt
+  clan      Clan     @relation(fields: [clanTag], references: [clanTag])
+  clanTag   String
+  data      Json
+  createdAt DateTime @default(now())
+
+  @@unique([clanTag, createdAt])
 }
 
 model TrophyHistory {
@@ -72,6 +75,8 @@ model TrophyHistory {
   gameTag   String
   trophies  Int
   createdAt DateTime @default(now())
+
+  @@unique([gameTag, trophies, createdAt])
 }
 
 model DonationHistory {
@@ -84,6 +89,8 @@ model DonationHistory {
   donationRatio     Float
   donerType         String
   createdAt         DateTime @default(now())
+
+  @@unique([gameTag, donations, createdAt])
 }
 
 model ClanCapitalContributionsHistory {
@@ -94,6 +101,8 @@ model ClanCapitalContributionsHistory {
   capitalContributions Int?
   totalContributions   Int
   createdAt            DateTime @default(now())
+
+  @@unique([clanTag, gameTag, createdAt])
 }
 
 // ---------------------------------------- 🪖⚔️ CLAN WAR LEAGUE TABLES --------------------------------------------------

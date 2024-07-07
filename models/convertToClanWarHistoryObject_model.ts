@@ -1,20 +1,6 @@
-/*
-  Ta följande nyckler
-
-  NYCKLAR     |     DB
-  endTime     |     seasonYear, seasonMonth -
-  teamSize    |     teamSize -
-  result      |     winner
-  clan.tag    |     clanOneTag -
-  opponent.tag|     clanTwoTag - 
-  clan        |     clanOneStats
-  opponent    |     clanTwoStats
-  */
-
 import { WarLog_ClanWarHistory } from "../types/Supercell/warLog.types";
 import { convertToCorrectDateObject } from "../utils/helpers/converToCorrectDateObj";
 import { ClanWarMatchObject } from "./types/clanWarObject.types";
-import { getAttackPercentage } from "../utils/helpers/getAttackPercentage";
 
 export function convertToClanWarHistoryObject(warData: WarLog_ClanWarHistory): ClanWarMatchObject | undefined {
   if (!warData) return;

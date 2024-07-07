@@ -18,12 +18,10 @@ import { doesClanWarAttackExist_clashyStats } from "../../../validation/war/does
  * @param clanTag
  * @returns void
  */
-export async function collectClanWar(clanTag: string) {
-  console.log("🏰 collectClanWar körs");
-  const clan_Tag = "#2QUCRRJYL";
 
+export async function collectClanWar(clanTag: string) {
   // get current clan war data
-  const clanWarData: ClanWarObject_Supercell = await getCurrentWar_superCell(clan_Tag);
+  const clanWarData: ClanWarObject_Supercell = await getCurrentWar_superCell(clanTag);
   const startTime: Date = convertToCorrectDateObject(clanWarData.startTime).fulldate;
   const endTime: Date = convertToCorrectDateObject(clanWarData.endTime).fulldate;
 

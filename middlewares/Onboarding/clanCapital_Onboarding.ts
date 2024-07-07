@@ -11,7 +11,6 @@ import {
   doesCapitalRaidsExist_clashyClash,
   doesClanCapitalRaidExits_clashyClash,
 } from "../../validation/clanCapital/clanCapital_validation";
-import { onBoard_ClanAndMembers } from "./clan_Onboarding";
 
 export async function onBoarding_ClanCapital(clanTag: string) {
   let raidID: number | undefined = 0;
@@ -30,9 +29,6 @@ export async function onBoarding_ClanCapital(clanTag: string) {
     const year = convertToCorrectDateObject(raid.startTime).getFullYear();
     const month = convertToCorrectDateObject(raid.startTime).getMonth();
     const capitalRaidsExist = await doesCapitalRaidsExist_clashyClash(clanTag, month, year);
-    console.log({ count, clanTag, month, year });
-    console.log("capitalRaidsExist: ", capitalRaidsExist);
-    console.log("🏳️‍🌈 raid", raid);
 
     if (capitalRaidsExist) {
       const capitalRaidResponse = await getClanCapitalRaids_clashyClash(clanTag, year, month);
@@ -96,10 +92,3 @@ export async function onBoarding_ClanCapital(clanTag: string) {
     }
   }
 }
-// get all clans from the database
-// get clan capital DATA
-/*
-    The data recived, the array-items in items are the raids, not specific to season, need to 
-    check the dates so we can filter the raids in to seasons
-*/
-// sort every raid for seasons. Sort every raids that happens within the same month.

@@ -1,6 +1,11 @@
 import { ClanObject } from "../../types/Supercell/clan.types";
 import { changeToURLencoding } from "../../utils/helpers/urlEncoding";
 
+/**
+ * 📚 Get the basic clan object from supercell
+ * @param clanTag
+ * @returns
+ */
 export async function getClan_superCell(clanTag: string): Promise<ClanObject | null> {
   const convertedClanTag = changeToURLencoding(clanTag);
   console.log("getClan_superCell |  convertedClanTag: ", convertedClanTag);
@@ -15,7 +20,6 @@ export async function getClan_superCell(clanTag: string): Promise<ClanObject | n
 
     return data;
   } catch (e) {
-    console.error("Error while fetching clan data", e);
-    throw e;
+    throw new Error(`Error while fetching clan | clanTag: ${clanTag} | Error: ${e}`);
   }
 }

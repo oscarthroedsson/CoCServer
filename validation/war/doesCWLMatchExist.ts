@@ -8,12 +8,16 @@ import prisma from "../../prisma";
  */
 export async function doesCWLMatchExist_clashyStats(roundId: number, clanTag: string) {
   const convertedClanTag = changeToURLencoding(clanTag);
-  const response = await prisma.clanWarLeagueMatch.findFirst({
-    where: {
-      roundId: roundId,
-      clanOneTag: convertedClanTag,
-    },
-  });
+  try {
+    const response = await prisma.clanWarLeagueMatch.findFirst({
+      where: {
+        roundId: roundId,
+        clanOneTag: convertedClanTag,
+      },
+    });
 
-  return !!response;
+    return !!response;
+  } catch (error) {
+    throw new Error(`Error while fetching clan war attack | Error: ${error} | fn: doesCWLMatchExist_clashyStats`);
+  }
 }

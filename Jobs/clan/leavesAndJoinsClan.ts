@@ -1,5 +1,6 @@
 import { getClan_superCell } from "../../API/Clan/clan_Api";
 import { onBoard_ClanMemberRegister } from "../../middlewares/Onboarding/clan_Onboarding";
+import { convertToLeaveAndJoinClanObject } from "../../models/convertToLeaveAndJoinClanObject";
 import {
   getAllClans_clashyStats,
   getJoinedAndLeaveClanHistory,
@@ -35,34 +36,42 @@ export async function job_leavesAndJoinsClan() {
     if (!currentMembersList) continue;
 
     /*
-    If current member cant´t be found, it means that the member has left the clan
+   📚 We loop over our latest member record to to see if we can find all members the members in the current memberlist from supercell
+   if not, they have left the clan
     */
     for (const member of previousMemberList?.members as LatestClanMembersObject[]) {
+      // 📚 Search if we can find the member in previous record among the current member list from supercell
       const stillInClan = currentMembersList.memberList.find((m: any) => member.gameName === m.name);
 
+      // 📚 if we found the member, this will be true or this will be false
       const found = stillInClan != undefined;
 
-      if (!found) {
-        console.log("LEFT: ", member.gameName);
-        newRecord.push(createLeaveAndJoinClanObject(member.gameName, member.gameTag, "left"));
-      }
+      // 📚 if didn´t found in current member list, create a record for leaving the clan
+      if (!found) newRecord.push(convertToLeaveAndJoinClanObject(member.gameName, member.gameTag, "left"));
     }
 
     /*
-    If current member cant´t be found, it means that the member has left the clan
+    📚 We loop over th current member list from supercell and see if we can find them in the latest member record. If not, they have joined since 
+    last time we checked
     */
     for (const member of currentMembersList.memberList) {
       // Check if the member has joined the clan (previousMemberList)
       const joinedClan = (previousMemberList.members as ClanMemberRecordObject[]).find((m) => m.gameTag === member.tag);
-
       const found = joinedClan !== undefined;
 
       // If not found in previousMemberList, create a record for joining the clan
-      if (!found) {
-        console.log("JOINED: ", member.name);
-        newRecord.push(createLeaveAndJoinClanObject(member.name, member.tag, "joined"));
-      }
+      if (!found) newRecord.push(convertToLeaveAndJoinClanObject(member.name, member.tag, "joined"));
     }
+
+    /*
+    📚 We create the response object of the results from our find
+    
+    "YYYY-MM-DD": {
+    left:[{gameTag: string, gameName: string, type: string, time: Date}...],
+    joined:[{gameTag: string, gameName: string, type: string, time: Date}...],
+    membershipChanges:[{gameTag: string, gameName: string, type: string, time: Date}...]
+    }
+    */
 
     const clanHistory = {
       [formattedDate]: {
@@ -71,61 +80,19 @@ export async function job_leavesAndJoinsClan() {
         membershipChanges: newRecord,
       },
     };
+
     const presentRecord = await getJoinedAndLeaveClanHistory(clanTag.clanTag);
-    console.log("🦖 PRESENTRECORD :", presentRecord);
 
     if (clanHistory[formattedDate].membershipChanges.length < 0) return;
 
     if (!presentRecord) {
-      console.log("Creating new record");
       storeJoinedAndLeaveClanHistory(clanTag.clanTag, clanHistory);
     } else {
       Object.assign(presentRecord.data, clanHistory);
       delete presentRecord.id;
-      console.log("presentRecord: ", presentRecord);
+
+      // 📚
       updateJoinedAndLeaveClanHistory(presentRecord);
     }
   }
 }
-
-export const createLeaveAndJoinClanObject = (
-  gameName: string,
-  gameTag: string,
-  type: string
-): MemberShipChangesObject => {
-  return {
-    gameTag: gameTag,
-    gameName: gameName,
-    type: type,
-    time: new Date(),
-  };
-};
-
-// {
-// clanTag: "#n123njd",
-// data:{
-//   clanTag: "#n123njd",
-//   "2022-01-01": {
-//     left: 10,
-//     joined: 5,
-//     membershipChanges: [],
-//   },
-//   "2022-01-02": {
-//     left: 10,
-//     joined: 5,a
-//     membershipChanges: [
-//       {
-//         gameTag: "#1234",
-//         gameName: "pelleSvansos",
-//         type: "left",
-//         time: new Date(),
-//       },
-//     ],
-//   },
-//   "2022-01-03": {
-//     left: 10,
-//     joined: 5,
-//     trackRecord: [],
-//   },
-// }
-// }

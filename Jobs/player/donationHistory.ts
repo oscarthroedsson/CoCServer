@@ -8,15 +8,17 @@ import { donationPerson } from "../../utils/constants/donationType";
 import { calculateRatio } from "../../utils/helpers/ratioCalculation";
 import { notTheSameMonth } from "../../validation/jobs/notTheSameMonth";
 
+/**
+ * @description This job will collect the donation history of all the players in the clan
+  and store it in the database. The job will run once a month.
+ */
 export async function job_CollectDonationHistory(): Promise<void> {
-  console.log("schedule| Running job_CollectDonationHistory()");
   const playersTag = await getAllPlayers_clashyStats();
 
   for (const player of playersTag) {
     const playerObject = await getPlayer_superCell(player.gameTag);
     if (playerObject) {
       const latestDonationHistory = await getLatestDonationHistory_clashyStats(player.gameTag);
-
       if (notTheSameMonth(latestDonationHistory?.createdAt)) {
         addDonationHistory_clashyStats({
           tag: player.gameTag,
@@ -26,8 +28,6 @@ export async function job_CollectDonationHistory(): Promise<void> {
           donationRatio: calculateRatio(playerObject.donations, playerObject.donationsReceived),
           donerType: donationPerson(playerObject.donations / playerObject.donationsReceived),
         });
-
-        //todo add to total donations on user object
       }
     }
   }

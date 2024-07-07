@@ -4,31 +4,41 @@ import {
   ClanWarLeagueAttack_clashyClash,
   ClanWarLeagueMatch_clashyClash,
 } from "../../types/ClashyStats/clanWarLeague.types";
-import { connect } from "http2";
 
 export async function storeClanWarLeagueSeason_ClashyStats(year: number, month: number) {
-  return await prisma.clanWarLeagueSeason.upsert({
-    where: {
-      seasonYear_seasonMonth: {
+  try {
+    return await prisma.clanWarLeagueSeason.upsert({
+      where: {
+        seasonYear_seasonMonth: {
+          seasonYear: year,
+          seasonMonth: month,
+        },
+      },
+      update: {},
+      create: {
         seasonYear: year,
         seasonMonth: month,
       },
-    },
-    update: {},
-    create: {
-      seasonYear: year,
-      seasonMonth: month,
-    },
-  });
+    });
+  } catch (error) {
+    throw new Error(
+      `Error while storing clan war league season | Error: ${error} | fn: storeClanWarLeagueSeason_ClashyStats`
+    );
+  }
 }
-export async function getClanWarLeagueSeason_ClashyStats() {}
 
 export async function storeClanWarLeagueGroup_clashyStats(seasonId: number) {
-  return await prisma.clanWarLeagueGroup.create({
-    data: {
-      seasonId,
-    },
-  });
+  try {
+    return await prisma.clanWarLeagueGroup.create({
+      data: {
+        seasonId,
+      },
+    });
+  } catch (error) {
+    throw new Error(
+      `Error while storing clan war league group | Error: ${error} | fn: storeClanWarLeagueGroup_clashyStats`
+    );
+  }
 }
 
 export async function getClanWarLeagueGroupBasedOnSeasonAndClanTag_clashyStats(
@@ -36,41 +46,53 @@ export async function getClanWarLeagueGroupBasedOnSeasonAndClanTag_clashyStats(
   month: number,
   clanTag: string
 ): Promise<{ id: number; seasonId: number; groupClans: any[] } | null | undefined> {
-  const result = await prisma.clanWarLeagueGroup.findMany({
-    where: {
-      season: {
-        seasonYear: year,
-        seasonMonth: month,
-      },
-      groupClans: {
-        some: {
-          clan: {
-            clanTag: clanTag,
+  try {
+    const result = await prisma.clanWarLeagueGroup.findMany({
+      where: {
+        season: {
+          seasonYear: year,
+          seasonMonth: month,
+        },
+        groupClans: {
+          some: {
+            clan: {
+              clanTag: clanTag,
+            },
           },
         },
       },
-    },
-    include: {
-      groupClans: true,
-    },
-  });
-  return result[0];
+      include: {
+        groupClans: true,
+      },
+    });
+    return result[0];
+  } catch (error) {
+    throw new Error(
+      `Error while getting clan war league group | Error: ${error} | fn: getClanWarLeagueGroupBasedOnSeasonAndClanTag_clashyStats`
+    );
+  }
 }
 
 export async function getClanWarLeagueGroup_clashyStats(seasonId: number) {
-  return await prisma.clanWarLeagueGroup.findFirst({
-    where: {
-      seasonId: seasonId,
-    },
-    include: {
-      groupClans: true,
-      rounds: {
-        include: {
-          matches: true,
+  try {
+    return await prisma.clanWarLeagueGroup.findFirst({
+      where: {
+        seasonId: seasonId,
+      },
+      include: {
+        groupClans: true,
+        rounds: {
+          include: {
+            matches: true,
+          },
         },
       },
-    },
-  });
+    });
+  } catch (error) {
+    throw new Error(
+      `Error while getting clan war league group | Error: ${error} | fn: getClanWarLeagueGroup_clashyStats`
+    );
+  }
 }
 
 export async function storeClanWarLeagueGroupClan_ClashyStats(groupId: number, clans: { tag: string; name: string }[]) {
@@ -82,30 +104,43 @@ export async function storeClanWarLeagueGroupClan_ClashyStats(groupId: number, c
       })),
     });
   } catch (error) {
-    console.log("Error while adding groupClans:", error);
-    return;
+    throw new Error(
+      `Error while storing clan war league group clan | Error: ${error} | fn: storeClanWarLeagueGroupClan_ClashyStats`
+    );
   }
 }
 
 export async function storeClanWarLeagueRound_ClashyStats(groupID: number, roundNumber: number) {
-  return await prisma.clanWarLeagueRound.create({
-    data: {
-      groupId: groupID,
-      roundNumber: roundNumber,
-    },
-  });
+  try {
+    return await prisma.clanWarLeagueRound.create({
+      data: {
+        groupId: groupID,
+        roundNumber: roundNumber,
+      },
+    });
+  } catch (error) {
+    throw new Error(
+      `Error while storing clan war league round | Error: ${error} | fn: storeClanWarLeagueRound_ClashyStats`
+    );
+  }
 }
 
 export async function getClanWarLeagueRound_ClashyStats(
   groupID: number,
   roundNumber: number
 ): Promise<{ id: number; groupId: number; roundNumber: number } | undefined | null> {
-  return await prisma.clanWarLeagueRound.findFirst({
-    where: {
-      groupId: groupID,
-      roundNumber: roundNumber,
-    },
-  });
+  try {
+    return await prisma.clanWarLeagueRound.findFirst({
+      where: {
+        groupId: groupID,
+        roundNumber: roundNumber,
+      },
+    });
+  } catch (error) {
+    throw new Error(
+      `Error while getting clan war league round | Error: ${error} | fn: getClanWarLeagueRound_ClashyStats`
+    );
+  }
 }
 
 export async function storeClanWarLeagueMatch_ClashyStats(roundID: number, match: ClanWarLeagueMatch_clashyClash) {
@@ -121,8 +156,9 @@ export async function storeClanWarLeagueMatch_ClashyStats(roundID: number, match
       },
     });
   } catch (error) {
-    console.error("Fel vid lägg till match:", error);
-    throw error;
+    throw new Error(
+      `Error while storing clan war league match | Error: ${error} | fn: storeClanWarLeagueMatch_ClashyStats`
+    );
   }
 }
 
@@ -141,46 +177,51 @@ export async function storeClanWarLeagueAttack_ClashyStats(attack: ClanWarLeague
       },
     });
   } catch (error) {
-    console.error("Fel vid lägg till attack:", error);
-    throw error;
+    throw new Error(
+      `Error while storing clan war league attack | Error: ${error} | fn: storeClanWarLeagueAttack_ClashyStats`
+    );
   }
 }
 
 export async function getClanWarLeagueWar(clanTag: string, seasonYear: number, seasonMonth: number) {
-  return await prisma.clanWarLeagueSeason.findFirst({
-    where: {
-      seasonYear,
-      seasonMonth,
-      ClanWarLeagueGroup: {
-        some: {
-          groupClans: {
-            some: {
-              clanTag,
+  try {
+    return await prisma.clanWarLeagueSeason.findFirst({
+      where: {
+        seasonYear,
+        seasonMonth,
+        ClanWarLeagueGroup: {
+          some: {
+            groupClans: {
+              some: {
+                clanTag,
+              },
             },
           },
         },
       },
-    },
-    include: {
-      ClanWarLeagueGroup: {
-        include: {
-          groupClans: {
-            include: {
-              clan: true,
+      include: {
+        ClanWarLeagueGroup: {
+          include: {
+            groupClans: {
+              include: {
+                clan: true,
+              },
             },
-          },
-          rounds: {
-            include: {
-              matches: {
-                include: {
-                  clanOne: true,
-                  clanTwo: true,
+            rounds: {
+              include: {
+                matches: {
+                  include: {
+                    clanOne: true,
+                    clanTwo: true,
+                  },
                 },
               },
             },
           },
         },
       },
-    },
-  });
+    });
+  } catch (errorr) {
+    throw new Error(`Error while getting clan war league war | Error: ${errorr} | fn: getClanWarLeagueWar`);
+  }
 }

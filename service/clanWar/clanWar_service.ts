@@ -10,37 +10,48 @@ import prisma from "../../prisma";
  * @param endTime
  * @returns boolean
  */
+//todo should move to validation 📁
 export async function checkIfClansMatchObjectExist_clashyStats(
   clanOneTag: string,
   startTime: Date,
   endTime: Date
 ): Promise<boolean> {
-  const matchObject = await prisma.clanWarMatch.findFirst({
-    where: {
-      clanOneTag: clanOneTag,
-      startTime: startTime,
-      endTime: endTime,
-    },
-  });
+  try {
+    const matchObject = await prisma.clanWarMatch.findFirst({
+      where: {
+        clanOneTag: clanOneTag,
+        startTime: startTime,
+        endTime: endTime,
+      },
+    });
 
-  return !!matchObject;
+    return !!matchObject;
+  } catch (error) {
+    throw new Error(
+      `Error while checking if clan war match object exists | Error: ${error} | fn: checkIfClansMatchObjectExist_clashyStats`
+    );
+  }
 }
 
 export async function storeClanWarMatch_clashyStats(matchObject: ClanWarMatchObject) {
-  return await prisma.clanWarMatch.create({
-    data: {
-      seasonYear: matchObject.seasonYear,
-      seasonMonth: matchObject.seasonMonth,
-      startTime: matchObject.startTime,
-      endTime: matchObject.endTime,
-      clanOneTag: matchObject.clanOneTag,
-      clanTwoTag: matchObject.clanTwoTag,
-      clanOneStats: matchObject.clanOneStats as unknown as Prisma.JsonObject,
-      clanTwoStats: matchObject.clanTwoStats as unknown as Prisma.JsonObject,
-      teamSize: matchObject.teamSize,
-      winner: matchObject.winner,
-    },
-  });
+  try {
+    return await prisma.clanWarMatch.create({
+      data: {
+        seasonYear: matchObject.seasonYear,
+        seasonMonth: matchObject.seasonMonth,
+        startTime: matchObject.startTime,
+        endTime: matchObject.endTime,
+        clanOneTag: matchObject.clanOneTag,
+        clanTwoTag: matchObject.clanTwoTag,
+        clanOneStats: matchObject.clanOneStats as unknown as Prisma.JsonObject,
+        clanTwoStats: matchObject.clanTwoStats as unknown as Prisma.JsonObject,
+        teamSize: matchObject.teamSize,
+        winner: matchObject.winner,
+      },
+    });
+  } catch (error) {
+    throw new Error(`Error while storing clan war match object | Error: ${error} | fn: storeClanWarMatch_clashyStats`);
+  }
 }
 /**
  * @description param needs to be in a array, even if its only one object.
@@ -64,7 +75,8 @@ export async function storeClanWarAttack_clashyStats(attack: ClanWarAttackObject
       },
     });
   } catch (error) {
-    console.error("🚨🚨🚨", error);
-    throw error;
+    throw new Error(
+      `Error while storing clan war attack object | Error: ${error} | fn: storeClanWarAttack_clashyStats`
+    );
   }
 }

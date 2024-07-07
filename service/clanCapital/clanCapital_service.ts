@@ -29,8 +29,8 @@ export async function storeClanCapitalRaids_clashyClash(
         totalRaids: data.totalRaids,
       },
     });
-  } catch (e) {
-    console.log("🚨 ERROR | storeClanCapitalRaids_clashyClash | ", e);
+  } catch (error) {
+    throw new Error(`Error while storing clan capital raids | Error: ${error} | fn: storeClanCapitalRaids_clashyClash`);
   }
 }
 
@@ -43,8 +43,8 @@ export async function getClanCapitalRaids_clashyClash(clanTag: string, year: num
         seasonMonth: month,
       },
     });
-  } catch (e) {
-    console.log("🚨 ERROR | getClanCapitalRaids_clashyClash | ", e);
+  } catch (error) {
+    throw new Error(`Error while fetching clan capital raids | Error: ${error} | fn: getClanCapitalRaids_clashyClash`);
   }
 }
 
@@ -77,8 +77,8 @@ export async function storeClanCapitalRaid_clashyClash(
         enemyDistrictsDestroyed: data.enemyDistrictsDestroyed,
       },
     });
-  } catch (e) {
-    console.log("🚨 ERROR | storeClanCapitalRaid_clashyClash | ", e);
+  } catch (error) {
+    throw new Error(`Error while storing clan capital raid | Error: ${error} | fn: storeClanCapitalRaid_clashyClash`);
   }
 }
 
@@ -100,8 +100,10 @@ export async function storeCapitalRaidDistricts_clashyClash(data: {
       },
     });
     return result;
-  } catch (e) {
-    console.log("🚨 ERROR storeCapitalRaidDistricts_clashyClash | ", e);
+  } catch (error) {
+    throw new Error(
+      `Error while storing capital raid districts | Error: ${error} | fn: storeCapitalRaidDistricts_clashyClash`
+    );
   }
 }
 
@@ -135,7 +137,9 @@ export async function storeCapitalDistrictAttacks_clashyClash(
     });
 
     return result;
-  } catch (e) {
-    console.log("🚨 ERROR | storeCapitalDistrictAttacks_clashyClash | ", e);
+  } catch (error) {
+    throw new Error(
+      `Error while storing capital district attacks | Error: ${error} | fn: storeCapitalDistrictAttacks_clashyClash`
+    );
   }
 }

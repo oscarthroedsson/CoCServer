@@ -3,8 +3,7 @@ import { storePlayer_clashyStats } from "../../service/Player/player_service";
 import { PlayerProps_clashyStats } from "../../types/ClashyStats/player.types";
 
 export async function onBoard_Player(playerTag: PlayerProps_clashyStats) {
-  if (!playerTag || !playerTag.gameTag || !playerTag.gameName)
-    return console.error("❗❗ Player data not found", playerTag);
+  if (!playerTag || !playerTag.gameTag || !playerTag.gameName) return;
 
   await storePlayer_clashyStats({
     gameTag: playerTag.gameTag,

@@ -173,16 +173,9 @@ export async function onBoard_clanWarLogHistory(clanTag: string) {
  */
 export async function onBoard_ClanAndMembers(clan: string) {
   await onBoard_Clan(clan);
-  console.log("✅ Clan added");
   await onBoard_ClanMembers(clan);
-  console.log("✅ Clan Members added");
   await onBoard_ClanMemberRegister(clan); // ✅ Tested n it works
-  console.log("✅ Clan Member Register added");
   await onBoarding_ClanCapital(clan); // ✅ Tested n it works
-  console.log("✅ Clan Capital Added");
   await onBoard_clanWarLogHistory(clan); // ✅ clanWar works
-  console.log("✅ Clan War Log History added");
   await onBoard_ClanWarLeaguesHistory(clan); // ✅ CWL history works
-  console.log("✅ Clan War League History added");
-  console.log("🚚 ✅ Onboarding Done ");
 }

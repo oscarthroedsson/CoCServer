@@ -6,14 +6,18 @@ export async function doesClanWarAttackExist_clashyStats(uniqueKeys: {
   defenderPlayerTag: string | null;
   attack: number;
 }): Promise<boolean> {
-  const clanWarAttack = await prisma.clanWarAttack.findFirst({
-    where: {
-      matchId: uniqueKeys.matchId,
-      attackerPlayerTag: uniqueKeys.attackerPlayerTag,
-      defenderPlayerTag: uniqueKeys.defenderPlayerTag,
-      attack: uniqueKeys.attack,
-    },
-  });
+  try {
+    const clanWarAttack = await prisma.clanWarAttack.findFirst({
+      where: {
+        matchId: uniqueKeys.matchId,
+        attackerPlayerTag: uniqueKeys.attackerPlayerTag,
+        defenderPlayerTag: uniqueKeys.defenderPlayerTag,
+        attack: uniqueKeys.attack,
+      },
+    });
 
-  return !!clanWarAttack; // Returns true if clanWarAttack exists, false otherwises
+    return !!clanWarAttack; // Returns true if clanWarAttack exists, false otherwises
+  } catch (error) {
+    throw new Error(`Errorr while fetching clan war attack | Error: ${error} | fn: doesClanWarAttackExist_clashyStats`);
+  }
 }

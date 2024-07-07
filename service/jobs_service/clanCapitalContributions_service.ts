@@ -14,8 +14,9 @@ export async function addClanCapitalContributions_clashyStats(data: ClanCapitalC
 
     return player;
   } catch (error) {
-    console.error("Error while updating player:", error);
-    throw error; // Rethrow the error for error handling
+    throw new Error(
+      `Error while storing clan capital contributions | Error: ${error} | fn: addClanCapitalContributions_clashyStats`
+    );
   }
 }
 
@@ -32,7 +33,8 @@ export async function getLatestClanCapitalContributions_clashyStats(gameTag: str
 
     return latestTrophyHistory;
   } catch (error) {
-    console.error("Error while fetching latest trophy history:", error);
-    throw error; // Rethrow the error for error handling
+    throw new Error(
+      `Error while fetching latest clan capital contributions | Error: ${error} | fn: getLatestClanCapitalContributions_clashyStats`
+    );
   }
 }

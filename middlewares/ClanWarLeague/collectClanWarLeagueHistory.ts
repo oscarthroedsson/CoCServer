@@ -30,11 +30,10 @@ export async function collectClanWarLeagueHistory(clanTag: string) {
   while (rounds !== 0) {
     // This is an upsert, if exist it returns, if not it creates and returns
     const { id: seasonID } = await storeClanWarLeagueSeason_ClashyStats(year, month);
-
-    console.log("Season ID:", seasonID);
     if (!seasonID) return;
+
     const cwlGroupHistory = await getCLWGroupHistory_ClashKing(clanTag, year, month);
-    if (!cwlGroupHistory) return console.log("❗❗ No more Data");
+    if (!cwlGroupHistory) return;
 
     const clans = cwlGroupHistory.clans.map((clan: { tag: string; name: string }) => ({
       tag: clan.tag,
@@ -45,9 +44,7 @@ export async function collectClanWarLeagueHistory(clanTag: string) {
     for (const clan of clans) {
       const doesClanExist = await doesClanExist_clashyStats(clan.tag);
       if (!doesClanExist) {
-        console.log("🚓 doesClanExist: ", doesClanExist);
         await storeClan_ClashyStats({ tag: clan.tag, name: clan.name });
-        console.log("🟢 Clan added to DB: ", clan.tag, " | ", clan.name);
       }
     }
 
@@ -60,11 +57,8 @@ export async function collectClanWarLeagueHistory(clanTag: string) {
         }))
     );
 
-    console.log("⏰ 😴 Adding members ");
-
     for (const member of allMembers) {
       if (!member || !member.tag) continue;
-
       const doesMemberExist = await doesPlayerExist_clashyStats(member.tag);
       if (!doesMemberExist) {
         await onBoard_Player({
@@ -76,7 +70,6 @@ export async function collectClanWarLeagueHistory(clanTag: string) {
         });
       }
     }
-    console.log("📦 added all members", allMembers.length, " st");
     groupObject.members = allMembers;
 
     // ---------------------------------------- 🧺 ADD TO DB ----------------------------------------
@@ -95,12 +88,9 @@ export async function collectClanWarLeagueHistory(clanTag: string) {
         const allAttacks = [...round.clanOneStats.attacks, ...round.clanTwoStats.attacks];
         for (const attack of allAttacks) {
           attack.matchId = matchID;
-          console.log("🪖🪖🪖 attack: ", attack);
           await storeClanWarLeagueAttack_ClashyStats(attack);
         }
-        console.log("🥕 All Attacks added to DB: ", allAttacks.length);
       }
-      console.log("⭕ All rounds added to DB", rounds.length);
     });
 
     if (month === 0) {
@@ -111,7 +101,6 @@ export async function collectClanWarLeagueHistory(clanTag: string) {
     }
 
     rounds--;
-    console.log("🪼 Fetching for: ", year, " ", month, "Round: ", rounds);
   }
   // validate and add the members to the DB
 }
